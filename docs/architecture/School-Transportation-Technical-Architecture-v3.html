@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+
+<html><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>School Transportation Technical Architecture</title><style>
+:root{--navy:#173a56;--navy2:#244e6d;--text:#273847;--muted:#667b8c;--line:#d6e0e7;--soft:#f6f9fb;--blue:#e7f1fa;--green:#e9f5ed;--sand:#f5f0e4;--lav:#f1ebf6;--amber:#f7f1dc;}
+*{box-sizing:border-box}
+@page{size:A4;margin:14mm 14mm 16mm 14mm;@top-right{content:"Technical Architecture Design";font:8pt "Segoe UI",Arial,sans-serif;color:#7a8d9b}@bottom-center{content:"Page " counter(page);font:8pt "Segoe UI",Arial,sans-serif;color:#7a8d9b}}
+@page cover{margin:0;@top-right{content:none}@bottom-center{content:none}}
+html,body{margin:0;padding:0;color:var(--text);font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;line-height:1.42;background:#edf2f5}
+.document{width:210mm;margin:0 auto;background:#fff;box-shadow:0 0 18px rgba(35,55,70,.12)}
+.cover{page:cover;min-height:297mm;padding:29mm 20mm 20mm;break-after:page;background:linear-gradient(150deg,#f5f9fc 0%,#fff 58%)}
+.cover .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:700;color:#6b8192;font-size:8.5pt;margin-bottom:8mm}
+.cover h1{font-size:29pt;line-height:1.08;color:var(--navy);margin:0;max-width:160mm}
+.cover h2{font-size:14pt;font-weight:500;line-height:1.35;color:#4f687b;margin:5mm 0 12mm;max-width:160mm}
+.cover .purpose{border:1px solid #bfd0dc;border-left:5px solid var(--navy);background:#f5f9fc;border-radius:4mm;padding:5.5mm 6.5mm;margin-bottom:7mm}
+.cover .purpose table{margin:0;border:0;font-size:10pt}.cover .purpose th{border:0;background:transparent;padding:0;line-height:1.4}
+.decision-title{font-size:10pt;font-weight:700;color:var(--navy);margin:5mm 0 3mm}
+.cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:3mm}.cover-card{border:1px solid #d5e0e7;border-radius:3mm;padding:3.5mm 4mm;background:#fff;min-height:19mm}.cover-card-label{font-size:7.6pt;letter-spacing:.05em;text-transform:uppercase;color:#6a8091;font-weight:700;margin-bottom:1mm}.cover-card-value{font-size:9.1pt;color:#213d52;font-weight:600;line-height:1.25}
+main{padding:0}
+.major-section{padding:0;margin:0}
+h1{font-size:18pt;line-height:1.18;color:var(--navy);margin:8mm 0 3.5mm;break-after:avoid-page}
+h2{font-size:13.3pt;line-height:1.22;color:var(--navy);margin:6mm 0 2.2mm;break-after:avoid-page}
+h3{font-size:11.5pt;color:var(--navy);margin:5mm 0 2mm;break-after:avoid-page}
+p{margin:0 0 3mm;orphans:3;widows:3}
+ul,ol{margin:1.5mm 0 3.6mm;padding-left:6mm}li{margin:1mm 0;break-inside:avoid}li p{margin:0}
+strong{color:var(--navy)}
+blockquote,.callout{border-left:4px solid #9bb5c7;margin:4mm 0;padding:3mm 4mm;background:#f7fafc;border-radius:1.5mm;break-inside:avoid}
+table{width:100%;border-collapse:collapse;margin:3mm 0 4.5mm;font-size:9pt;break-inside:auto}thead{display:table-header-group}tr{break-inside:avoid-page}th,td{border:1px solid #c7d3dc;padding:2.2mm 2.4mm;vertical-align:top}th{background:#eaf2f7;color:var(--navy);font-weight:700;text-align:left}tr:nth-child(even) td{background:#fbfcfd}
+code,pre{font-family:"Consolas","Liberation Mono",monospace;font-size:8.5pt;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#f7f9fb;border:1px solid #dce4e9;border-radius:2mm;padding:3mm;break-inside:avoid-page}
+.diagram-block{margin:4mm 0 4.5mm;padding:3mm 3mm 2.5mm;background:#fbfcfd;border:1px solid #dce4e9;border-radius:3mm;break-inside:avoid-page}.diagram-title{display:flex;gap:3mm;align-items:center;color:var(--navy);font-weight:700;font-size:10.2pt;margin:0 0 2mm}.diagram-title span{font-size:7.7pt;letter-spacing:.04em;text-transform:uppercase;color:#698091;border:1px solid #cdd9e1;border-radius:999px;padding:1mm 2mm;background:white}.arch-svg{display:block;width:100%;height:auto;max-height:162mm}figcaption{text-align:center;color:#607686;font-size:8.5pt;font-style:italic;margin-top:2mm}
+.arch-svg .node rect{stroke-width:2.2}.arch-svg .node.blue rect{fill:#e7f1fa;stroke:#2e6388}.arch-svg .node.green rect{fill:#e9f5ed;stroke:#4e7a5b}.arch-svg .node.data rect{fill:#f5f0e4;stroke:#897749}.arch-svg .node.adapter rect{fill:#f1ebf6;stroke:#715c87}.arch-svg .node.worker rect{fill:#f7f1dc;stroke:#a2842d}.arch-svg .node.core rect{fill:#e4eef7;stroke:#355f7d;stroke-width:3}.arch-svg .node-title{font:700 18px "Segoe UI",Arial,sans-serif;fill:#173a56}.arch-svg .node-sub{font:14px "Segoe UI",Arial,sans-serif;fill:#42596a}.arch-svg .label{font:16px "Segoe UI",Arial,sans-serif;fill:#263746}.arch-svg .lane{font:700 15px "Segoe UI",Arial,sans-serif;letter-spacing:1.4px;fill:#667b8c}.arch-svg .section-label{font:700 17px "Segoe UI",Arial,sans-serif;fill:#173a56}.arch-svg .arrow{stroke:#456a84;stroke-width:2.6;fill:none}.arch-svg .arrow-head{fill:#456a84}.arch-svg .edge-label-bg{fill:white;opacity:.94}.arch-svg .edge-label{font:12px "Segoe UI",Arial,sans-serif;fill:#667b8c}.arch-svg .note-box{fill:#fff;stroke:#d6e0e7;stroke-width:2}.arch-svg .note-title{font:700 17px "Segoe UI",Arial,sans-serif;fill:#173a56}.arch-svg .note-text{font:14px "Segoe UI",Arial,sans-serif;fill:#42596a}.arch-svg .time-axis{stroke:#758b9a;stroke-width:2}.arch-svg .tick{stroke:#758b9a;stroke-width:2}.arch-svg .time-text{font:700 14px "Segoe UI",Arial,sans-serif;fill:#42596a}.arch-svg .wave-one{fill:#e7f1fa;stroke:#2e6388;stroke-width:2}.arch-svg .wave-two{fill:#e9f5ed;stroke:#4e7a5b;stroke-width:2}.arch-svg .turnaround{fill:#f7f1dc;stroke:#a2842d;stroke-width:2}.arch-svg .wave-text{font:700 16px "Segoe UI",Arial,sans-serif;fill:#173a56}.arch-svg .small-text{font:11px "Segoe UI",Arial,sans-serif;fill:#5f6f7c}.arch-svg .deadline{stroke:#a15c5c;stroke-width:2}.arch-svg .deadline-text{font:700 13px "Segoe UI",Arial,sans-serif;fill:#8a4c4c}.arch-svg .resource-label{font:700 14px "Segoe UI",Arial,sans-serif;fill:#42596a}.arch-svg .resource-busy{fill:#e9eef2;stroke:#8ca0ae;stroke-width:1.5}.arch-svg .resource-text{font:13px "Segoe UI",Arial,sans-serif;fill:#667b8c}.arch-svg .transaction-box{fill:#f9fbfc;stroke:#355f7d;stroke-width:3}.arch-svg .transaction-title{font:700 18px "Segoe UI",Arial,sans-serif;fill:#173a56}.arch-svg .commit-text{font:700 15px "Segoe UI",Arial,sans-serif;fill:#355f7d;letter-spacing:1px}.arch-svg .test-layer{font:700 18px "Segoe UI",Arial,sans-serif;fill:#173a56}
+@media screen{.document{margin:16px auto}.major-section{padding:0 14mm}.cover{padding-left:20mm;padding-right:20mm}}
+@media print{html,body{background:#fff}.document{width:auto;margin:0;box-shadow:none}.major-section{padding:0}a{color:inherit;text-decoration:none}}
+
+
+/* Unified architecture-document theme */
+:root{--ink:#243746;--brand:#173a56;--brand-2:#2d5f82;--muted-2:#6c8190;--surface:#f8fafc;--surface-2:#f1f5f8;--stroke:#cfdae2;--cmd:#e9f5ed;--qry:#e7f1fa;--infra:#f5f0e4;--ext:#f1ebf6;--warn:#f7f1dc;--danger:#f8ecec;}
+body{letter-spacing:0;background:#eaf0f4}
+.document{border-radius:2px;overflow:hidden}
+h1{font-size:18.5pt;letter-spacing:-.015em;margin-top:7mm}
+h2{font-size:13.4pt;letter-spacing:-.01em}
+p,li,td,th{hyphens:none}
+.major-section>p:first-of-type{color:#344b5c}
+.section-intro{font-size:10.2pt;color:#40596b;margin-bottom:4mm}
+.diagram-block{background:#fafcfd;border-color:#d7e1e8;padding:4mm;border-radius:3.2mm;box-shadow:none}
+.diagram-title{font-size:10.4pt;margin-bottom:3mm}.diagram-title span{background:#eef4f7;color:#526b7d;border-color:#cedbe3}
+figcaption{margin-top:2.4mm;color:#617786}
+.callout{border-left-color:#789ab0;background:#f5f9fb}
+.callout.warning{border-left-color:#b18b35;background:#fbf8ee}
+.callout.definition{border-left-color:#6b8e75;background:#f4faf6}
+.small-note{font-size:8.6pt;color:#687d8d}
+
+/* File tree */
+.tree-shell{border:1px solid var(--stroke);border-radius:3mm;background:#f9fbfc;margin:3mm 0 5mm;break-inside:avoid-page;overflow:hidden}
+.tree-head{display:flex;justify-content:space-between;gap:4mm;padding:3mm 4mm;background:#edf4f8;border-bottom:1px solid var(--stroke);align-items:center}
+.tree-head strong{font-size:10.4pt}.tree-head span{font-size:8.2pt;color:var(--muted-2)}
+.file-tree{margin:0;border:0;border-radius:0;background:#fff;padding:4mm 5mm;font-size:8.25pt;line-height:1.34;white-space:pre;overflow:visible;color:#243746}
+.tree-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:2mm;padding:3mm 4mm;background:#f8fafb;border-top:1px solid var(--stroke);font-size:8.2pt}
+.tree-legend div{min-width:0}.tree-legend strong{display:block;margin-bottom:.5mm}
+
+/* Responsive diagram system built with HTML, avoiding SVG text collision */
+.html-diagram{margin:4mm 0 5mm;border:1px solid var(--stroke);border-radius:3mm;background:#fbfcfd;padding:4mm;break-inside:avoid-page}
+.html-diagram .figure-label{display:flex;align-items:center;gap:2.5mm;margin-bottom:3mm;color:var(--brand);font-weight:700;font-size:10.4pt}
+.html-diagram .figure-label b{font-size:7.6pt;letter-spacing:.05em;text-transform:uppercase;color:#5f7687;border:1px solid #cbd8e0;border-radius:999px;padding:1mm 2mm;background:#fff}
+.flow-row{display:grid;grid-template-columns:minmax(0,1fr) 11mm minmax(0,1fr) 11mm minmax(0,1fr);gap:1.2mm;align-items:stretch;margin:2.2mm 0}
+.flow-row.four{grid-template-columns:minmax(0,1fr) 9mm minmax(0,1fr) 9mm minmax(0,1fr) 9mm minmax(0,1fr)}
+.flow-row.six{grid-template-columns:minmax(0,1fr) 7mm minmax(0,1fr) 7mm minmax(0,1fr) 7mm minmax(0,1fr) 7mm minmax(0,1fr) 7mm minmax(0,1fr)}
+.flow-node{min-width:0;border:1.4px solid #9eb2c0;border-radius:2.5mm;background:#fff;padding:3mm;display:flex;flex-direction:column;justify-content:center;min-height:24mm}
+.flow-node strong{font-size:9.6pt;line-height:1.18;margin-bottom:1mm}.flow-node span{font-size:8.1pt;line-height:1.3;color:#536979}
+.flow-node.blue{background:var(--qry);border-color:#6590ae}.flow-node.green{background:var(--cmd);border-color:#71967b}.flow-node.sand{background:var(--infra);border-color:#9b895c}.flow-node.purple{background:var(--ext);border-color:#8a769c}.flow-node.amber{background:var(--warn);border-color:#b0903e}.flow-node.red{background:var(--danger);border-color:#aa7777}.flow-node.core{background:#e4eef7;border:2px solid #4e7894}
+.flow-arrow{display:flex;align-items:center;justify-content:center;color:#57788f;font-size:15pt;font-weight:700;line-height:1}.flow-arrow.down{height:9mm;font-size:16pt}
+.diagram-band{margin:3mm 0 0;padding:2.5mm 3mm;border:1px dashed #b9c9d3;border-radius:2mm;background:#fff;font-size:8.3pt;color:#566c7c}
+.diagram-band strong{margin-right:1mm}
+.diagram-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:3mm;align-items:stretch}
+.diagram-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;align-items:stretch}
+.lane-card{border:1px solid var(--stroke);border-radius:2.5mm;background:#fff;padding:3mm;min-width:0}
+.lane-card h3{font-size:10.4pt;margin:0 0 2.5mm}.lane-stack{display:grid;gap:2mm}.lane-arrow{text-align:center;color:#57788f;font-size:14pt;line-height:1;margin:-.5mm 0}
+.transaction-frame{border:2px solid #4c718c;border-radius:3mm;background:#f7fafc;padding:3mm;margin:3mm 0}.transaction-frame .transaction-title{font-weight:700;color:var(--brand);margin-bottom:2mm;display:flex;justify-content:space-between;gap:3mm}.commit-bar{text-align:center;margin:2.5mm 0 0;padding:2mm;border-radius:2mm;background:#e6eff5;color:#244e6d;font-weight:800;letter-spacing:.06em}
+.reliability-chips{display:flex;flex-wrap:wrap;gap:1.5mm;margin-top:3mm}.chip{display:inline-block;padding:1.2mm 2mm;border-radius:999px;border:1px solid #c4d2db;background:#fff;color:#536b7b;font-size:7.8pt;font-weight:600}
+.method-card{border:1px solid var(--stroke);border-top:3px solid #6187a1;border-radius:2.5mm;background:#fff;padding:3mm;min-width:0}.method-card h3{margin:0 0 1.5mm;font-size:10pt}.method-card .formula{margin-top:2mm;padding:2mm;background:#f6f9fb;border-radius:1.8mm;font-family:Consolas,"Liberation Mono",monospace;font-size:7.8pt;color:#334e60}.method-card p{font-size:8.4pt;margin:0;color:#526a79}
+.boundary-split{display:grid;grid-template-columns:1fr auto 1fr;gap:3mm;align-items:stretch;margin-top:3mm}.boundary-divider{width:1px;background:#cdd8df;position:relative}.boundary-divider:after{content:"≠";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#8c6a2a;font-size:15pt;font-weight:700;padding:1mm}
+.ownership-card{border:1px solid var(--stroke);border-radius:2.5mm;padding:3mm;background:#fff}.ownership-card h3{margin:0 0 1.5mm;font-size:10pt}.ownership-card ul{margin:0;padding-left:5mm;font-size:8.5pt}
+
+@media screen and (max-width:900px){.flow-row,.flow-row.four,.flow-row.six{grid-template-columns:1fr}.flow-arrow{transform:rotate(90deg);min-height:7mm}.diagram-grid-2,.diagram-grid-3,.boundary-split{grid-template-columns:1fr}.boundary-divider{width:auto;height:1px}.tree-legend{grid-template-columns:1fr}.file-tree{white-space:pre-wrap}}
+@media print{
+  .html-diagram,.tree-shell,.diagram-block,.lane-card,.method-card,.transaction-frame{break-inside:avoid-page}
+  h1,h2,h3{break-after:avoid-page}
+  .file-tree{font-size:7.9pt;line-height:1.28}
+  .flow-node{min-height:21mm;padding:2.5mm}.flow-node strong{font-size:9.1pt}.flow-node span{font-size:7.7pt}
+  .method-card p{font-size:8pt}.method-card .formula{font-size:7.3pt}
+}
+
+.page-start{break-before:page}
+@media print{.page-start{break-before:page}}
+
+.compact-diagram{padding:3mm;margin-top:3mm}
+.compact-diagram .flow-node{min-height:17mm;padding:2mm}
+.compact-diagram .flow-node strong{font-size:8.9pt;margin-bottom:.6mm}
+.compact-diagram .flow-node span{font-size:7.4pt;line-height:1.2}
+.compact-diagram .diagram-grid-2{gap:2mm}
+.compact-diagram .diagram-band{margin-top:2mm;padding:2mm 2.5mm}
+
+/* Print-safe text flow inside minimal diagrams */
+.minimal-figure .flow-card{display:block;min-height:20mm;height:auto;overflow:visible}
+.minimal-figure .flow-card strong{display:block;line-height:1.2;margin:0 0 1.2mm;overflow-wrap:anywhere;word-break:normal}
+.minimal-figure .flow-card span{display:block;line-height:1.34;overflow-wrap:anywhere;word-break:normal}
+.minimal-figure .simple-flow.dense .flow-card{min-height:18mm}
+.minimal-figure .lane-card{overflow:visible}
+
+
+/* Minimal, consistent architecture diagram system */
+.html-diagram.minimal-figure{
+  margin:4mm 0 5mm;
+  padding:4mm;
+  background:#fbfcfd;
+  border:1px solid var(--stroke);
+  border-radius:3mm;
+  break-inside:avoid-page;
+}
+.minimal-figure .figure-label{
+  display:flex;align-items:center;gap:2.5mm;
+  margin:0 0 3mm;color:var(--brand);font-weight:700;font-size:10.3pt;
+}
+.minimal-figure .figure-label b{
+  font-size:7.5pt;letter-spacing:.05em;text-transform:uppercase;
+  color:#5f7687;border:1px solid #cbd8e0;border-radius:999px;
+  padding:.9mm 2mm;background:#fff;
+}
+.simple-flow{display:flex;align-items:stretch;gap:1.4mm;margin:2mm 0;min-width:0}
+.simple-flow .flow-card{flex:1 1 0;min-width:0}
+.flow-card{
+  border:1.2px solid #9fb2c0;border-radius:2.2mm;background:#fff;
+  padding:2.5mm 2.7mm;min-height:22mm;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.flow-card strong{display:block;font-size:9.1pt;line-height:1.16;color:var(--brand);margin-bottom:.8mm}
+.flow-card span{display:block;font-size:7.7pt;line-height:1.28;color:#536979}
+.flow-card.core{background:var(--qry);border-color:#6b93af}
+.flow-card.domain{background:var(--cmd);border-color:#77987f}
+.flow-card.infra{background:var(--infra);border-color:#9c8c63}
+.flow-card.external{background:var(--ext);border-color:#8b799a}
+.flow-card.policy{background:var(--warn);border-color:#af9348}
+.flow-card.neutral{background:#f7f9fb;border-color:#aab9c4}
+.arrow-cell{
+  flex:0 0 6mm;display:flex;align-items:center;justify-content:center;
+  color:#54758d;font-size:15pt;font-weight:700;line-height:1;
+}
+.simple-flow.dense .flow-card{padding:2.1mm 2mm;min-height:19mm}
+.simple-flow.dense .flow-card strong{font-size:8.1pt}.simple-flow.dense .flow-card span{font-size:7pt}
+.simple-flow.dense .arrow-cell{flex-basis:4.5mm;font-size:12pt}
+.figure-band{
+  margin-top:2.5mm;padding:2.3mm 2.8mm;border-radius:2mm;
+  background:#f4f7f9;border:1px solid #d9e2e8;
+  font-size:7.8pt;line-height:1.35;color:#536979;
+}
+.figure-band strong{color:var(--brand)}
+.lane-grid{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:2.5mm 0}
+.lane-card{border:1px solid #d4dee5;border-radius:2.5mm;background:#fff;padding:3mm;min-width:0}
+.lane-card h3{font-size:9.2pt;margin:0 0 2mm;color:var(--brand)}
+.lane-card .simple-flow{margin:0}
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5mm;margin:2.5mm 0}
+.stage-panel{border:1px solid #d4dee5;border-radius:2.5mm;background:#fff;padding:3mm;min-width:0}
+.stage-panel h3{font-size:8.8pt;margin:0 0 1.8mm;color:var(--brand)}
+.stage-panel p{font-size:7.6pt;line-height:1.32;color:#536979;margin:0}
+.option-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2mm;margin:2mm 0}
+.option-card{border:1px solid #d4dee5;border-radius:2mm;background:#fff;padding:2.5mm;min-width:0}
+.option-card strong{display:block;font-size:8.4pt;color:var(--brand);margin-bottom:.7mm}
+.option-card span{font-size:7.3pt;line-height:1.28;color:#536979}
+.timeline-wrap{margin:2.5mm 0}
+.timeline-head{display:grid;grid-template-columns:repeat(5,1fr);font-size:7.5pt;color:#536979;margin-bottom:1mm;text-align:center}
+.timeline-bar{display:flex;align-items:stretch;height:16mm;border:1px solid #c9d5dd;border-radius:2mm;overflow:hidden;background:#fff}
+.timeline-seg{display:flex;align-items:center;justify-content:center;text-align:center;font-size:7.8pt;font-weight:700;color:var(--brand);padding:1mm}
+.timeline-seg.wave1{flex:38;background:var(--qry)}
+.timeline-seg.turn{flex:8;background:var(--warn);font-size:6.8pt}
+.timeline-seg.wave2{flex:35;background:var(--cmd)}
+.timeline-seg.buffer{flex:4;background:#f7f9fb;color:#7b8d99;font-size:6.8pt}
+.resource-grid{display:grid;grid-template-columns:27mm 1fr;gap:1.2mm 2mm;margin-top:2.5mm;font-size:7.6pt;align-items:center}
+.resource-grid .resource-name{font-weight:700;color:var(--brand)}
+.resource-bar{height:7mm;background:#eef2f5;border:1px solid #cbd7df;border-radius:1.5mm;display:flex;align-items:center;padding:0 2mm;color:#627887}
+.test-stack{display:flex;flex-direction:column;gap:1.5mm;margin:2mm 0}
+.test-stack .flow-card{min-height:15mm}
+.test-stack .l1{margin:0 9%}.test-stack .l2{margin:0 7%}.test-stack .l3{margin:0 5%}.test-stack .l4{margin:0 3%}.test-stack .l5{margin:0}
+.provider-list{display:flex;flex-wrap:wrap;gap:1.5mm;margin-top:2.5mm}
+.provider-chip{border:1px solid #d1dce4;border-radius:999px;background:#fff;padding:1.2mm 2.2mm;font-size:7.3pt;color:#536979}
+@media print{
+ .html-diagram.minimal-figure{break-inside:avoid-page}
+ .simple-flow,.lane-grid,.stage-grid,.option-grid,.timeline-wrap{break-inside:avoid-page}
+}
+
+/* Print-safe text flow inside minimal diagrams */
+.minimal-figure .flow-card{display:block;min-height:20mm;height:auto;overflow:visible}
+.minimal-figure .flow-card strong{display:block;line-height:1.2;margin:0 0 1.2mm;overflow-wrap:anywhere;word-break:normal}
+.minimal-figure .flow-card span{display:block;line-height:1.34;overflow-wrap:anywhere;word-break:normal}
+.minimal-figure .simple-flow.dense .flow-card{min-height:18mm}
+.minimal-figure .lane-card{overflow:visible}
+
+.flow-card small{font-size:6.8pt;line-height:1.2;color:#667d8d}
+</style></head><body><div class="document"><section class="cover">
+<div class="eyebrow">Technical Architecture Design</div>
+<h1>School Transportation Management Solution</h1>
+<h2>Implementation architecture for planning, operations, cost management, tracking, attendance, integrations, and payments</h2>
+<div class="purpose"><table>
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Purpose<br/>
+</strong>Translate BRD Version 2 into a practical technical architecture
+for a single-school deployment, with a strong focus on deterministic
+transportation planning, multi-wave fleet scheduling, operational
+reliability, and future extensibility.</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table></div>
+<div class="decision-title">Architecture decisions at a glance</div><div class="cover-grid"><div class="cover-card"><div class="cover-card-label">Deployment</div><div class="cover-card-value">One school per isolated deployment and database</div></div><div class="cover-card"><div class="cover-card-label">Reference scale</div><div class="cover-card-value">~1,200 students / ~30 buses</div></div><div class="cover-card"><div class="cover-card-label">Architecture</div><div class="cover-card-value">Clean Architecture modular monolith + Worker</div></div><div class="cover-card"><div class="cover-card-label">Backend</div><div class="cover-card-value">.NET 10 / ASP.NET Core</div></div><div class="cover-card"><div class="cover-card-label">Clients</div><div class="cover-card-value">Angular 21 + React Native / TypeScript</div></div><div class="cover-card"><div class="cover-card-label">Data</div><div class="cover-card-value">PostgreSQL + PostGIS</div></div><div class="cover-card"><div class="cover-card-label">Core patterns</div><div class="cover-card-value">CQRS, mediator, domain events, event handlers, transactional outbox</div></div><div class="cover-card"><div class="cover-card-label">Testing</div><div class="cover-card-value">xUnit, Moq, Testcontainers, Architecture.Tests</div></div></div>
+</section><main><section class="major-section"><h1 id="executive-architecture-summary">1. Executive Architecture Summary</h1>
+<p class="section-intro">The solution uses a single-school deployment model with one isolated database, a modular monolith for transactional business capabilities, and a separate Worker host for long-running planning jobs and durable background delivery. The design keeps deployment simple while preserving strict module ownership and Clean Architecture dependency direction.</p>
+<ul>
+<li>ASP.NET Core API is the operational entry point for administrative, mobile, integration-webhook, and real-time use cases.</li>
+<li>Business modules are organized as module folders inside shared Domain, Application, and Infrastructure projects. API and Worker are thin hosts.</li>
+<li>The Planning module owns planning use cases and persistence abstractions; the Worker hosts long-running Planning application use cases rather than bypassing module boundaries.</li>
+<li>PostgreSQL is the transactional system of record and PostGIS provides geospatial capabilities needed for locations, serviceability, proximity, and map-related data.</li>
+<li>Cost Management owns configurable fuel/transportation-cost calculations. Billing / Payments owns transportation-fee collection, installments, payment transactions, and outstanding balances. A calculated operational cost is not assumed to equal the fee charged to a parent.</li>
+<li>Provider-specific details remain in Infrastructure behind inward-facing abstractions for maps, WhatsApp, payments, school-system APIs, attendance devices, notifications, and storage.</li>
+<li>Deterministic rules and solver logic own transportation feasibility, capacity, scheduling conflicts, route validity, cost-calculation methods, and configured business decisions. AI, if introduced later, remains an assistant layer.</li>
+</ul>
+<div class="callout definition"><strong>Business alignment.</strong> The BRD requires pre-registration feasibility, seat availability and pricing; configurable route planning; multiple trips per bus per shift; supervisor review; live tracking; attendance; ETA updates; configurable fuel-cost calculation; online payments/installments; configurable operational reporting; and external integrations. This architecture separates those responsibilities so they can evolve without fighting each other.</div>
+<div class="callout definition"><strong>Operational resilience.</strong> The BRD does not explicitly define offline mobile behavior. This architecture adds degraded/offline operation for the Driver and Bus Attendant experience as a production-readiness requirement: the active trip remains usable, operational events are durably queued on-device, and synchronization is explicit when connectivity returns.</div></section><section class="major-section"><h1 id="architecture-principles">2. Architecture Principles</h1>
+<table><thead><tr><th>Principle</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>Single-school isolation</td><td>Each school receives its own deployment, database, and configuration set. The codebase remains common; school behavior is configuration-driven rather than implemented through school-specific forks.</td></tr>
+<tr><td>Module-first Clean Architecture</td><td>Business modules repeat as folders/namespaces inside shared Domain, Application, and Infrastructure projects. API and Worker are host projects. Separate module assemblies are deferred until extraction has a concrete ownership, scaling, or deployment benefit.</td></tr>
+<tr><td>Clean dependency direction</td><td>Domain is framework-independent. Application depends on Domain. Infrastructure implements Application/Domain abstractions. API and Worker compose the system and contain no business rules.</td></tr>
+<tr><td>Pragmatic CQRS</td><td>Commands and queries use separate handlers/models. Commands operate on aggregates and commit through one Unit of Work; queries use read-specific projections. Separate read/write databases are not required initially.</td></tr>
+<tr><td>Deterministic transportation core</td><td>Feasibility, capacity, scheduling, route constraints, cost-calculation methods, and optimizer validity are explicit rules. Human-overridable policies require an explicit supervisor decision and audit reason.</td></tr>
+<tr><td>Versioned planning artifacts</td><td>A PlanningRun captures immutable input/configuration snapshots and generated output. Supervisor changes create a revision; they do not overwrite the original optimizer result.</td></tr>
+<tr><td>Planned vs operational separation</td><td>TripPlan and related planning artifacts are separate from date-specific TripExecution, GPS, actual stop visits, and boarding/exit events.</td></tr>
+<tr><td>Cost vs billing separation</td><td>Cost Management calculates operational fuel/transportation costs according to configured methods. Billing / Payments records the commercial transportation fee and payment lifecycle. Their relationship is a business rule, not an architectural assumption.</td></tr>
+<tr><td>Provider adapters at boundaries</td><td>Provider SDKs, credentials, webhook formats, retry policies, and device protocols stay in Infrastructure behind application-facing interfaces.</td></tr>
+<tr><td>Auditability and durability</td><td>Plan approvals/overrides, manual corrections, payment actions, cost-calculation inputs, and durable integration events must be traceable. The transactional outbox protects durable side effects.</td></tr>
+<tr><td>Offline-capable operational mobile</td><td>The Driver/Attendant app must continue the active trip during temporary connectivity loss using a minimal encrypted trip snapshot and a durable local sync queue. Offline state is visible to the user; synchronization is idempotent and conflict-aware.</td></tr><tr><td>Privacy by design</td><td>Collect, expose, cache, export and retain only data required for the user’s operational purpose. Child location/movement data receives strong access, retention, audit and device-storage controls; legal/compliance obligations are treated as architecture inputs, not deployment afterthoughts.</td></tr></tbody></table></section><section class="major-section"><h1 id="technology-baseline">3. Technology Baseline</h1>
+<table><thead><tr><th>Layer / concern</th><th>Baseline</th><th>Architecture role</th></tr></thead><tbody>
+<tr><td>Admin web</td><td>Angular 21</td><td>Admin and Transportation Supervisor workflows, planning review, configuration, monitoring, cost management, billing administration, and reports.</td></tr>
+<tr><td>Mobile</td><td>React Native + TypeScript</td><td>Driver, attendant, and parent/student experiences. Driver/Attendant operational flows use a minimal encrypted local trip snapshot and durable store-and-forward synchronization so temporary connectivity loss does not stop the active trip.</td></tr><tr><td>Mobile offline state</td><td>Encrypted local store + client outbox/sync engine</td><td>Active-trip snapshot, pending operational events, idempotent retry, version/conflict detection, and explicit online/offline/sync status. Provider-dependent offline navigation remains an open decision.</td></tr>
+<tr><td>Backend</td><td>ASP.NET Core / .NET 10</td><td>API host + Worker host using Clean Architecture, CQRS/Mediator, FluentValidation, domain events, event handlers, repositories, and Unit of Work.</td></tr>
+<tr><td>Persistence</td><td>PostgreSQL</td><td>Single transactional database per school deployment.</td></tr>
+<tr><td>Geospatial</td><td>PostGIS</td><td>Home locations, service zones, spatial queries, proximity and route-related data.</td></tr>
+<tr><td>ORM</td><td>EF Core</td><td>Module-owned mappings, aggregate persistence, read projections, concurrency, transactions, and outbox storage.</td></tr>
+<tr><td>Realtime</td><td>SignalR</td><td>Supervisor tracking and operational updates; not a replacement for durable persistence.</td></tr>
+<tr><td>Optimization</td><td>Google OR-Tools - candidate</td><td>Candidate solver for assignment/routing/scheduling after prototype validation.</td></tr>
+<tr><td>Background processing</td><td>.NET Worker Service + durable job/outbox state</td><td>Long-running Planning application use cases, outbox retries/delivery, and other durable background work.</td></tr>
+<tr><td>Validation</td><td>FluentValidation + domain invariants</td><td>FluentValidation validates request/application input; aggregate/domain rules protect business invariants.</td></tr>
+<tr><td>Testing</td><td>xUnit, Moq, Testcontainers, Architecture.Tests</td><td>Fast domain/application tests, real PostgreSQL/PostGIS integration tests, API tests, and dependency-rule enforcement.</td></tr>
+</tbody></table></section><section class="major-section"><h1 class="figure-section-heading" id="high-level-system-architecture">4. High-Level System Architecture</h1><figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 1</b>System Architecture</div>
+<div class="simple-flow">
+<div class="flow-card core"><strong>Clients</strong><span>Angular Admin Web<br/>React Native Mobile<br/><small>Driver/Attendant local trip cache + sync queue</small></span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>ASP.NET Core API</strong><span>REST · SignalR · Auth · CQRS/Mediator</span></div><div class="arrow-cell">→</div>
+<div class="flow-card neutral"><strong>Runtime &amp; integrations</strong><span>PostgreSQL/PostGIS · Planning Worker · provider adapters</span></div>
+</div>
+<div class="option-grid">
+<div class="option-card"><strong>Database</strong><span>Operational and geospatial data</span></div>
+<div class="option-card"><strong>Worker</strong><span>Planning jobs and outbox processing</span></div>
+<div class="option-card"><strong>Adapters</strong><span>Maps, WhatsApp, payments, school API, attendance device</span></div>
+</div>
+<div class="figure-band"><strong>Boundary:</strong> API and Worker host Application use cases. Provider-specific behavior stays in Infrastructure.</div>
+<figcaption>Single-school container architecture with one operational API, one database, a dedicated Worker, and provider adapters.</figcaption></figure><p>The API remains the primary transactional entry point. The Worker hosts long-running Planning use cases and outbox processing through the same Application/Infrastructure contracts used by the API; it does not bypass module ownership. Driver/Attendant mobile keeps only the minimum active-trip data needed for degraded/offline operation and synchronizes queued operations through the API when connectivity returns. External provider calls and inbound callbacks are handled only through Infrastructure adapters.</p></section><section class="major-section"><h1 class="figure-section-heading" id="solution-structure---module-first-clean-architecture-in-shared-layer-projects">5. Solution Structure - Module-first Clean Architecture</h1>
+<p class="section-intro">The implementation starts with five runtime projects. Business modules are explicit folders/namespaces inside the shared layers, but a module is only placed in the layers it actually needs. For example, Reporting is primarily Application/Infrastructure read-model and export orchestration; it does not require an empty Domain folder merely for symmetry.</p>
+<div class="tree-shell">
+<div class="tree-head"><strong>Backend solution tree</strong><span>Baseline structure · module-first within shared layer projects</span></div>
+<pre class="file-tree">SchoolTransportation/
+├── src/
+│   ├── Domain/
+│   │   ├── Common/
+│   │   ├── Students/
+│   │   ├── Registration/
+│   │   ├── Fleet/
+│   │   ├── Planning/
+│   │   ├── Trips/
+│   │   ├── Attendance/
+│   │   ├── Tracking/
+│   │   ├── CostManagement/
+│   │   └── Billing/
+│   │
+│   ├── Application/
+│   │   ├── Common/
+│   │   │   ├── Behaviors/
+│   │   │   ├── Messaging/
+│   │   │   └── Abstractions/
+│   │   ├── Students/
+│   │   ├── Registration/
+│   │   ├── Fleet/
+│   │   ├── Planning/
+│   │   ├── Trips/
+│   │   ├── Attendance/
+│   │   ├── Tracking/
+│   │   ├── CostManagement/
+│   │   ├── Billing/
+│   │   └── Reporting/
+│   │
+│   ├── Infrastructure/
+│   │   ├── Persistence/
+│   │   ├── Messaging/
+│   │   │   └── Outbox/
+│   │   ├── Planning/
+│   │   ├── CostManagement/
+│   │   ├── Tracking/
+│   │   ├── Maps/
+│   │   ├── WhatsApp/
+│   │   ├── Payments/
+│   │   ├── AttendanceDevices/
+│   │   ├── SchoolSystem/
+│   │   └── Reporting/
+│   │
+│   ├── API/
+│   └── Worker/
+│
+└── tests/
+    ├── Domain.UnitTests/
+    ├── Application.UnitTests/
+    ├── Infrastructure.IntegrationTests/
+    ├── API.IntegrationTests/
+    └── Architecture.Tests/</pre>
+<div class="tree-legend"><div><strong>Domain</strong>Aggregates, entities, value objects, domain services/rules, repository contracts where domain-owned, and framework-free domain events.</div><div><strong>Application</strong>CQRS handlers, validators, behaviors, use-case abstractions, event handlers, read models, and integration-event contracts.</div><div><strong>Infrastructure + Hosts</strong>EF Core/PostGIS, repository/read implementations, provider adapters, solver implementation, outbox storage/processing; API/Worker only compose and transport.</div></div>
+</div>
+<figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 2</b>Module-first Clean Architecture</div>
+<div class="simple-flow four">
+<div class="flow-card external"><strong>API / Worker</strong><span>Transport and composition hosts</span></div><div class="arrow-cell">→</div>
+<div class="flow-card infra"><strong>Infrastructure</strong><span>Persistence · providers · outbox · optimizer adapters</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Application</strong><span>CQRS handlers · behaviors · abstractions</span></div><div class="arrow-cell">→</div>
+<div class="flow-card domain"><strong>Domain</strong><span>Aggregates · value objects · rules · domain events</span></div>
+</div>
+<div class="figure-band"><strong>Dependency rule:</strong> dependencies point inward. Business modules repeat as folders/namespaces inside Domain, Application, and Infrastructure.</div>
+<figcaption>Clean Architecture dependency direction for the shared layer projects.</figcaption></figure>
+<div class="callout"><strong>Boundary rule.</strong> <code>Common</code> stays intentionally small: Entity/AggregateRoot/ValueObject primitives, Result/Error, IDomainEvent, time abstractions, CQRS behaviors, and messaging/outbox abstractions. Student, Fleet, Planning, Cost Management, Billing, and other business behavior remains in its owning module.</div>
+</section><section class="major-section"><h1 id="proposed-business-modules-and-ownership">6. Business Modules and Ownership</h1>
+<p class="section-intro">Ownership is defined by business responsibility, not by database table proximity. Modules may share one physical PostgreSQL database, but another module must not mutate an aggregate by reaching directly into its tables or DbSet.</p>
+<table><thead><tr><th>Module</th><th>Primary ownership</th></tr></thead><tbody>
+<tr><td>Students</td><td>Student, parent/guardian relationship, profile attributes, grade/class, gender, contact information, and precise home location.</td></tr>
+<tr><td>Registration</td><td>Transportation application, requested session/shift, serviceability outcome, seat-availability outcome, waitlist/manual-review status, registration confirmation, and the price quote snapshot presented before confirmation.</td></tr>
+<tr><td>Fleet</td><td>Bus, capacity/capabilities, driver, attendant, availability, and resource assignment eligibility.</td></tr>
+<tr><td>Planning</td><td>PlanningRun, input/configuration snapshot, constraint evaluation, candidate assignment, optimized routes, multi-wave fleet schedule, generated plan, violations, metrics, supervisor revision/override and approval state.</td></tr>
+<tr><td>Trips</td><td>Approved operational trip definitions and date/session execution lifecycle, including stop sequence and assigned resources once a plan is published for operation.</td></tr>
+<tr><td>Attendance</td><td>Boarding/exit events, attendance source, session-level attendance state, manual correction and attendance history.</td></tr>
+<tr><td>Tracking</td><td>Live bus/TripExecution position, latest vehicle state, selected tracking history, and ETA inputs/operational updates.</td></tr>
+<tr><td>Cost Management</td><td>Admin-configured fuel-cost inputs, configured calculation method, operational trip/student cost calculations, input snapshots, and cost reporting data. It does not own payment collection.</td></tr>
+<tr><td>Billing / Payments</td><td>Transportation fee charged to the parent/student, payment gateway transactions, installments, payment documents, and outstanding balance. It does not redefine operational fuel-cost calculations.</td></tr>
+<tr><td>Notifications</td><td>Channel orchestration, templates/policies where defined, and delivery tracking for parent/driver/attendant notifications and announcements.</td></tr>
+<tr><td>Reporting</td><td>Read-oriented cross-module reporting projections and export orchestration. Reporting does not become an alternate write path; report DTOs are purpose-specific, field/role authorization is enforced, sensitive exports are audited, and retention/masking rules are applied where required.</td></tr>
+<tr><td>Identity / Access</td><td>Authentication integration, roles/permissions and authorization policies for the product roles defined by the BRD.</td></tr>
+</tbody></table>
+<div class="callout warning"><strong>Price is not automatically fuel cost.</strong> The BRD requires a price to be presented before registration and separately defines configurable fuel/transportation-cost calculations plus online payment/installment handling. The exact relationship between operational cost and the commercial fee remains a business-design decision and must not be guessed in code.</div>
+</section><section class="major-section"><h1 id="cqrs-mediator-repositories-and-validation">7. CQRS, Mediator, Repositories, and Validation</h1><p>The Application layer uses pragmatic CQRS. Commands express state-changing use cases, load aggregates through domain-specific repositories, enforce domain invariants, and commit through one IUnitOfWork. Queries use read-specific services/projections and may project directly with AsNoTracking. FluentValidation validates request/application input in the mediator pipeline; it does not replace aggregate invariants.</p><figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 3</b>CQRS Processing Pipeline</div>
+<div class="simple-flow dense">
+<div class="flow-card neutral"><strong>Entry Point</strong><span>HTTP endpoint / Worker trigger</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Request</strong><span>Command or Query</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Mediator</strong><span>Dispatch</span></div><div class="arrow-cell">→</div>
+<div class="flow-card neutral"><strong>Behaviors</strong><span>Logging · validation</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Handler</strong><span>Application use case</span></div>
+</div>
+<div class="lane-grid">
+<div class="lane-card"><h3>Command path</h3><div class="simple-flow dense"><div class="flow-card domain"><strong>Aggregate</strong><span>Enforce invariants</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>Repository</strong><span>Load / track</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>IUnitOfWork</strong><span>Single commit</span></div></div></div>
+<div class="lane-card"><h3>Query path</h3><div class="simple-flow dense"><div class="flow-card core"><strong>Read Service</strong><span>DbContext / purpose-built query</span></div><div class="arrow-cell">→</div><div class="flow-card neutral"><strong>Projection</strong><span>AsNoTracking</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>DTO</strong><span>Required fields only</span></div></div></div>
+</div>
+<div class="figure-band"><strong>CQRS rule:</strong> commands protect aggregate invariants and own a transaction boundary; queries do not pass through aggregate repositories or IUnitOfWork.</div>
+<figcaption>Common mediator pipeline followed by distinct command and query paths.</figcaption></figure><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Concern</strong></th>
+<th><strong>Recommended approach</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Commands</td>
+<td>Intent-oriented commands such as RegisterTransportation,
+GeneratePlan, ApprovePlan, StartTrip, MarkStudentAbsent.</td>
+</tr>
+<tr class="even">
+<td>Queries</td>
+<td>Read-specific projections through query-side abstractions; use
+AsNoTracking/direct DTO projection when aggregate behavior is not
+required.</td>
+</tr>
+<tr class="odd">
+<td>Mediator</td>
+<td>MediatR routes commands, queries, domain-event notifications, and
+in-process integration-event handlers. API/Worker remain
+transport/composition hosts.</td>
+</tr>
+<tr class="even">
+<td>Repositories</td>
+<td>Domain-specific command repositories track aggregates only. They do
+not call SaveChanges and should not become a generic
+IRepository&lt;TEntity&gt; wrapper around DbSet.</td>
+</tr>
+<tr class="odd">
+<td>EF Core</td>
+<td>EF Core is the persistence engine. A thin IUnitOfWork wrapper
+dispatches domain events, lets handlers track outbox/related changes,
+then performs one SaveChanges transaction.</td>
+</tr>
+<tr class="even">
+<td>FluentValidation</td>
+<td>Request/application validation such as required fields, ranges,
+input shape, and command-level validation. Runs through a MediatR
+pipeline behavior.</td>
+</tr>
+<tr class="odd">
+<td>Domain invariants</td>
+<td>Rules that must always hold regardless of caller: capacity, valid
+state transitions, overlap validity, approval constraints, etc.</td>
+</tr>
+</tbody>
+</table></section><section class="major-section"><h1 id="domain-events-and-event-handlers">8. Domain Events and Event Handlers</h1><p>Domain events are framework-free, past-tense facts raised by aggregates after their invariants are satisfied. Infrastructure adapts IDomainEvent instances to MediatR notifications so Application event handlers can react without coupling Domain to MediatR. A durable cross-module or external reaction is translated into a separate Integration Event and persisted to the transactional outbox.</p><figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 4</b>Domain Event Processing</div>
+<div class="simple-flow dense">
+<div class="flow-card domain"><strong>Aggregate</strong><span>Changes valid state</span></div><div class="arrow-cell">→</div>
+<div class="flow-card domain"><strong>Domain Event</strong><span>Past-tense fact</span></div><div class="arrow-cell">→</div>
+<div class="flow-card infra"><strong>UoW / Dispatcher</strong><span>Coordinate dispatch</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Application Handler</strong><span>React in-process</span></div>
+</div>
+<div class="figure-band"><strong>Durable reaction:</strong> when another module or external system must receive the fact reliably, the handler creates an Integration Event and writes it to the outbox. Domain events themselves are not published externally.</div>
+<figcaption>Framework-free domain facts are dispatched to Application handlers after domain invariants are satisfied.</figcaption></figure><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Event example</strong></th>
+<th><strong>Possible reactions</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>StudentLocationChanged</td>
+<td>Recheck feasibility; mark affected draft planning inputs stale;
+audit the change.</td>
+</tr>
+<tr class="even">
+<td>TransportationRegistrationConfirmed</td>
+<td>Make the student eligible for future planning; update reporting
+projections.</td>
+</tr>
+<tr class="odd">
+<td>PlanningRunCompleted</td>
+<td>Expose the plan for supervisor review; update planning
+status/notifications.</td>
+</tr>
+<tr class="even">
+<td>PlanApproved</td>
+<td>Create operational trip definitions; enqueue a durable integration
+event when required.</td>
+</tr>
+<tr class="odd">
+<td>StudentAbsentForSession</td>
+<td>Make the stop skippable for that session; recalculate ETA; notify
+relevant users.</td>
+</tr>
+<tr class="even">
+<td>StudentBoarded / StudentExited</td>
+<td>Update attendance and parent-facing transport status.</td>
+</tr>
+<tr class="odd">
+<td>PaymentReceived</td>
+<td>Update balance/installment projection and receipt workflow.</td>
+</tr>
+</tbody>
+</table><table>
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Event rule<br/>
+Domain events announce successful domain facts; aggregate invariants are
+enforced before the event is raised. Domain events remain
+framework-free. The infrastructure dispatcher adapts them to MediatR
+application handlers. Durable integration events are separate contracts
+persisted through the transactional outbox.</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table><p>Command transaction sequence: the handler changes aggregate state → the aggregate raises domain event(s) → IUnitOfWork dispatches those events → Application event handlers may add further tracked changes and/or OutboxMessage records → one EF Core SaveChanges commits the complete command transaction. Domain events themselves are not published externally.</p></section><section class="major-section"><h1 class="figure-section-heading" id="planning-engine-architecture">9. Planning Engine Architecture</h1><p>The Planning module is the core transportation-optimization capability. It builds a versioned PlanningRun from validated registration, fleet, policy and travel-time inputs; evaluates hard/soft/human-overridable constraints; assigns students to feasible trip candidates; sequences stops; schedules multiple waves against bus/driver/attendant calendars; validates the result; and records violations, metrics and unassigned reasons without silently waiving rules.</p><figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 5</b>Planning Engine Pipeline</div>
+<div class="simple-flow dense">
+<div class="flow-card neutral"><strong>Input Snapshot</strong><span>Students · fleet · rules · travel matrix</span></div><div class="arrow-cell">→</div>
+<div class="flow-card policy"><strong>Constraint Evaluation</strong><span>Hard · soft · override rules</span></div><div class="arrow-cell">→</div>
+<div class="flow-card domain"><strong>Candidate Assignment</strong><span>Feasible trip candidates</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Route Optimization</strong><span>Stop order · time · distance</span></div>
+</div>
+<div class="simple-flow dense">
+<div class="flow-card infra"><strong>Multi-wave Scheduling</strong><span>Bus · driver · attendant calendars</span></div><div class="arrow-cell">→</div>
+<div class="flow-card policy"><strong>Feasibility Validation</strong><span>Violations · metrics · unassigned</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>PlanningRun</strong><span>Versioned generated result</span></div>
+</div>
+<div class="figure-band"><strong>Deterministic rule:</strong> the PlanningRun is persisted only after the generated result passes final feasibility validation and records all unresolved violations or unassigned reasons.</div>
+<figcaption>Deterministic planning flow from validated inputs to a versioned PlanningRun.</figcaption></figure><h2 id="planning-inputs">9.1 Planning inputs</h2><ul>
+<li><p>Eligible registered students and their precise home
+locations.</p></li>
+<li><p>Morning/afternoon requested session and current transportation
+status.</p></li>
+<li><p>Bus capacity, availability, capabilities, and configurable school
+rules.</p></li>
+<li><p>Driver/attendant availability and assignment
+restrictions.</p></li>
+<li><p>School location, arrival deadline, operational buffer, and
+turnaround time.</p></li>
+<li><p>Maximum student ride duration and other configured planning
+limits.</p></li>
+<li><p>Routing/travel-time matrix from the selected map/routing
+provider.</p></li>
+<li><p>Optimization mode and objective weights, such as travel time
+and/or fuel-related cost.</p></li>
+</ul><h2 id="constraint-classification">9.2 Constraint classification</h2><table>
+<colgroup>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Type</strong></th>
+<th><strong>Examples</strong></th>
+<th><strong>System behavior</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hard</td>
+<td>Bus capacity; impossible resource overlap; unserviceable location;
+invalid shift/resource availability.</td>
+<td>Solver must not generate an automatically approved solution that
+violates these constraints.</td>
+</tr>
+<tr class="even">
+<td>Soft</td>
+<td>Lower distance, lower travel time, balanced fleet usage, fewer
+vehicles, lower cost.</td>
+<td>Solver may trade these objectives according to configured
+weights.</td>
+</tr>
+<tr class="odd">
+<td>Human-overridable</td>
+<td>Maximum ride time or selected policy limits under exceptional
+circumstances.</td>
+<td>System flags violation; supervisor must explicitly approve with
+reason. The solver does not silently waive the rule.</td>
+</tr>
+</tbody>
+</table><h2 id="multi-wave-scheduling">9.3 Multi-wave scheduling</h2><figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 6</b>Multi-Wave Scheduling</div>
+<div class="timeline-wrap">
+<div class="timeline-head"><span>06:10</span><span>06:48</span><span>06:56</span><span>07:31</span><span>07:35 deadline</span></div>
+<div class="timeline-bar"><div class="timeline-seg wave1">Wave 1 · 38 min</div><div class="timeline-seg turn">8 min</div><div class="timeline-seg wave2">Wave 2 · 35 min</div><div class="timeline-seg buffer">4 min<br/>buffer</div></div>
+</div>
+<div class="resource-grid">
+<div class="resource-name">Bus 7</div><div class="resource-bar">Occupied across both waves and turnaround</div>
+<div class="resource-name">Driver 12</div><div class="resource-bar">Same resource calendar checked for conflicts</div>
+<div class="resource-name">Attendant 4</div><div class="resource-bar">Same resource calendar checked for conflicts</div>
+</div>
+<div class="figure-band"><strong>Scheduling rule:</strong> start times are calculated against the school-arrival deadline while enforcing turnaround and resource availability.</div>
+<figcaption>Morning multi-wave example with turnaround and shared resource calendars.</figcaption></figure><p>A bus is not modeled as having a single route. It has a daily
+resource schedule containing one or more trips per shift. The scheduler
+must answer which bus performs each trip, in what order, and when each
+wave must begin.</p><table>
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Backward scheduling example<br/>
+</strong>If the school target arrival is 07:35, Wave 2 requires 32
+minutes, turnaround is 8 minutes, and Wave 1 requires 38 minutes, then
+Wave 2 must begin by 07:03, Wave 1 must finish by 06:55, and the bus
+must begin Wave 1 by approximately 06:17. Detailed models must also
+include where the bus physically ends one wave and starts the next.</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table><h2 id="planningrun-aggregate">9.4 PlanningRun aggregate</h2><figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 7</b>PlanningRun Versioning and Supervisor Review</div>
+<div class="simple-flow dense">
+<div class="flow-card neutral"><strong>Input Snapshot</strong><span>Students · rules · fleet</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Generated Plan</strong><span>Immutable optimizer output</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Supervisor Review</strong><span>Approve or modify</span></div>
+</div>
+<div class="lane-grid">
+<div class="lane-card"><h3>Approve unchanged</h3><div class="simple-flow dense"><div class="flow-card core"><strong>Approved Plan</strong><span>Published baseline</span></div></div></div>
+<div class="lane-card"><h3>Modify</h3><div class="simple-flow dense"><div class="flow-card policy"><strong>Plan Revision</strong><span>Manual change + reason</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>Approved Plan</strong><span>Published revision</span></div></div></div>
+</div>
+<div class="figure-band"><strong>Immutability rule:</strong> supervisor changes create a revision; the original generated result is never overwritten.</div>
+<figcaption>Supervisor approval has two explicit paths without crossing or ambiguous state transitions.</figcaption></figure><ul>
+<li><p>InputSnapshot - students/resources/settings used for the
+run.</p></li>
+<li><p>ConfigurationSnapshot - constraints and objective configuration
+as of generation time.</p></li>
+<li><p>SolverVersion - identifies the planning algorithm/version
+used.</p></li>
+<li><p>GeneratedPlan - bus schedules, trips, stop sequences,
+assignments, times.</p></li>
+<li><p>UnassignedStudents - students that could not be feasibly
+assigned, with reasons.</p></li>
+<li><p>Violations/Warnings - hard, soft, and overridable
+findings.</p></li>
+<li><p>Metrics - distance, expected travel time, fleet utilization,
+objective score.</p></li>
+<li><p>Status - Draft, Running, Completed, Failed, UnderReview,
+Approved, Rejected, Superseded.</p></li>
+<li><p>Revision history - supervisor edits create a new revision rather
+than destroying the original solver result.</p></li>
+</ul><h2 id="planning-job-execution">9.5 Planning job execution</h2><ol type="1">
+<li><p>API validates request and creates a durable PlanningRun in
+Pending/Queued state.</p></li>
+<li><p>Planning Worker claims the job and records Started/Running
+state.</p></li>
+<li><p>Worker builds a deterministic input snapshot and obtains the
+required distance/time matrix.</p></li>
+<li><p>Constraint engine validates inputs and classifies impossible
+assignments.</p></li>
+<li><p>Assignment, route optimization, and fleet scheduling produce a
+candidate plan.</p></li>
+<li><p>Final feasibility validation checks the complete plan
+independently of solver objective score.</p></li>
+<li><p>Plan, metrics, warnings, and unassigned reasons are persisted
+atomically.</p></li>
+<li><p>PlanningRunCompleted domain event is raised; the supervisor can
+review and revise the result.</p></li>
+</ol></section><section class="major-section"><h1 id="planned-vs-operational-data">10. Planned vs Operational Data</h1><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Planning side</strong></th>
+<th><strong>Operational side</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TripPlan</td>
+<td>TripExecution</td>
+</tr>
+<tr class="even">
+<td>PlannedStop</td>
+<td>ActualStopVisit</td>
+</tr>
+<tr class="odd">
+<td>PlannedArrival</td>
+<td>ActualArrival</td>
+</tr>
+<tr class="even">
+<td>PlannedStudentAssignment</td>
+<td>ActualBoarding/Exit events</td>
+</tr>
+<tr class="odd">
+<td>Generated/approved schedule</td>
+<td>Live resource state and GPS positions</td>
+</tr>
+</tbody>
+</table><p>This separation allows the platform to compare planned versus actual
+performance, improve ETA, preserve audit history, and later learn which
+assumptions cause repeated deviations.</p><figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 8</b>Planned vs Operational Model</div>
+<div class="simple-flow">
+<div class="flow-card core"><strong>PlanningRun</strong><span>Input/configuration snapshot · solver metrics</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>TripPlan</strong><span>Planned stops · times · student assignments</span></div><div class="arrow-cell">→</div>
+<div class="flow-card policy"><strong>Publish Boundary</strong><span>Create date/session execution</span></div><div class="arrow-cell">→</div>
+<div class="flow-card domain"><strong>TripExecution</strong><span>Actual state · GPS · arrivals · boarded/exited</span></div>
+</div>
+<div class="figure-band"><strong>Boundary:</strong> planning artifacts remain stable for audit; operational data records what actually happened.</div>
+<figcaption>Planning data and live operational execution are separate models connected only at publish time.</figcaption></figure></section><section class="major-section">
+<h1 id="student-session-status-and-attendance">11. Student Session Status and Attendance</h1>
+<p class="section-intro">Morning and afternoon are modeled independently. A single <code>Student.IsAbsent</code> flag is insufficient because the same student may use the bus in one session and alternative transportation in the other. Attendance is modeled as an operational fact; device/network transport concerns stay outside the domain model.</p>
+<table>
+<thead><tr><th>Entity / event</th><th>Key fields</th></tr></thead>
+<tbody>
+<tr><td>StudentTransportationStatus</td><td>StudentId, Date, Session, Status (Expected / Absent / AlternativeTransport / Cancelled), Source, UpdatedBy.</td></tr>
+<tr><td>AttendanceEvent</td><td>EventId, StudentId, TripExecutionId, Session, EventType (Boarded / Exited), OccurredAt, Location, Source, DeviceId.</td></tr>
+</tbody></table>
+<ul>
+<li>Attendance hardware is not allowed to shape the domain model. Bluetooth/NFC/device-specific protocols remain Infrastructure concerns.</li>
+<li>Supported attendance sources can include <code>BluetoothDevice</code>, <code>DriverApp</code>, <code>AttendantApp</code>, <code>ManualCorrection</code>, or <code>Import</code>.</li>
+<li><code>EventId</code> is created at the event source so retries can be idempotent. The server records receipt/synchronization metadata separately from the attendance fact.</li>
+<li>Device integration remains deferred until hardware/protocol validation, while the domain stays ready to ingest normalized events.</li>
+</ul>
+<h2>11.1 Mobile Offline and Synchronization Strategy</h2>
+<p>The Driver/Attendant operational experience uses <strong>store-and-forward</strong>. Temporary connectivity loss must not prevent access to the active trip or the recording of operational events. Offline behavior is a production-readiness architecture requirement; it is not an explicit BRD requirement.</p>
+<div class="simple-flow dense">
+<div class="flow-card core"><strong>Operational UI</strong><span>Trip · stops · students · attendance</span></div>
+<div class="arrow-cell">→</div>
+<div class="flow-card infra"><strong>Encrypted Local Store</strong><span>Minimal active-trip snapshot + client outbox</span></div>
+<div class="arrow-cell">→</div>
+<div class="flow-card policy"><strong>Sync Engine</strong><span>Retry · ordering · idempotency · version checks</span></div>
+<div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>API</strong><span>Accept · duplicate · conflict · reject</span></div>
+</div>
+<div class="callout definition"><strong>Time semantics.</strong> <code>OccurredAt</code> is when the student actually boarded/exited. Server-side <code>ReceivedAt</code> is when the event reaches the backend. A delayed sync must never rewrite the real occurrence time.</div>
+<table>
+<thead><tr><th>Concern</th><th>Offline behavior / conflict rule</th></tr></thead>
+<tbody>
+<tr><td>Active trip</td><td>Cache the minimum operational TripExecution snapshot before departure: stop sequence, assigned students/resources, required contact/stop data, planned times and a trip-version identifier.</td></tr>
+<tr><td>Attendance</td><td>Append locally with a client-generated EventId; sync later. Duplicate retries are ignored server-side.</td></tr>
+<tr><td>Trip state</td><td>Start/complete and similar transitions use idempotent client-operation IDs. Invalid or stale transitions are rejected explicitly.</td></tr>
+<tr><td>Supervisor / parent changes</td><td>Server remains authoritative. The device records the trip version it is using and pulls/reconciles changes when connectivity returns; the UI must show when it is using an offline snapshot.</td></tr>
+<tr><td>Chat / operational messages</td><td>May queue locally, but the UI must show <em>Pending — offline</em> until acknowledged. Safety-critical procedures may require a non-app fallback.</td></tr>
+<tr><td>Payments and plan approval</td><td>Online-only. Financial actions and supervisor planning approval are not accepted as offline queued operations.</td></tr>
+</tbody></table>
+<div class="callout warning"><strong>Mobile data protection.</strong> Cache only the data required for the assigned active trip. Credentials/keys use the platform secure store; cached operational data uses encrypted local storage and a defined expiration/wipe policy. A Driver/Attendant must not receive the entire school dataset.</div>
+</section><section class="major-section"><h1 id="real-time-tracking-and-eta">12. Real-Time Tracking and ETA</h1><ul>
+<li>Driver/vehicle device sends <code>BusId</code>, <code>TripExecutionId</code>, coordinates, timestamp, and optional heading/speed.</li>
+<li>Tracking owns the latest operational position and selected history according to the retention policy.</li>
+<li>SignalR distributes relevant live updates to the Transportation Supervisor experience; durable state remains in PostgreSQL.</li>
+<li>Parent ETA is derived from current position, remaining operational stop sequence, travel-time information, and session-specific changes such as skipped stops.</li>
+<li>The Tracking module may consume planned/operational trip data through contracts/read models; it does not mutate PlanningRun or TripPlan artifacts.</li>
+<li>At the reference scale, a dedicated streaming platform such as Kafka is not required initially.</li>
+<li>When connectivity is lost, the device may buffer selected GPS samples for later history synchronization, but the server cannot represent them as live data while disconnected.</li><li>Supervisor and Parent experiences must expose freshness. A stale position is labeled with its last-update time; after a configurable freshness threshold, live location/ETA is shown as temporarily unavailable rather than pretending a stale point is current.</li></ul><figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 9</b>Real-Time Tracking and ETA Flow</div>
+<div class="simple-flow dense">
+<div class="flow-card core"><strong>Device</strong><span>TripExecutionId · position · timestamp</span></div><div class="arrow-cell">→</div>
+<div class="flow-card core"><strong>Tracking Use Case</strong><span>Validate trip · persist state</span></div>
+</div>
+<div class="lane-grid">
+<div class="lane-card"><h3>Supervisor path</h3><div class="simple-flow dense"><div class="flow-card infra"><strong>PostgreSQL</strong><span>Latest state / history</span></div><div class="arrow-cell">→</div><div class="flow-card domain"><strong>SignalR</strong><span>Live updates</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>Dashboard</strong><span>Fleet visibility</span></div></div></div>
+<div class="lane-card"><h3>Parent ETA path</h3><div class="simple-flow dense"><div class="flow-card neutral"><strong>ETA Inputs</strong><span>Position · stops · delays</span></div><div class="arrow-cell">→</div><div class="flow-card domain"><strong>ETA</strong><span>Updated arrival estimate</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>Parent App</strong><span>Pickup / drop-off ETA</span></div></div></div>
+</div>
+<div class="figure-band"><strong>Boundary:</strong> Tracking and ETA operate on TripExecution state and never mutate PlanningRun or TripPlan.</div>
+<figcaption>One tracking use case feeds both live supervisor visibility and operational ETA calculation.</figcaption></figure><div class="callout warning"><strong>Offline tracking rule.</strong> Attendance can be captured offline and synchronized later; real-time tracking cannot. Buffered GPS points recover history after reconnection, not the lost real-time view. Offline turn-by-turn navigation depends on the selected map-provider/device capability and remains an open decision.</div></section><section class="major-section"><h1 id="integration-architecture">13. Integration Architecture</h1>
+<p class="section-intro">Application use cases depend on provider-neutral interfaces. Infrastructure owns provider SDKs, credentials, HTTP details, webhook payloads, retries, protocol translation and anti-corruption mapping. Domain code never references Google Maps, Meta/WhatsApp, a payment SDK, or a hardware-device SDK directly.</p>
+<figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 10</b>Integration Boundaries and Adapters</div>
+<div class="lane-card"><h3>Outbound provider call</h3><div class="simple-flow dense"><div class="flow-card core"><strong>Application Use Case</strong><span>Provider-neutral intent</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>Interface</strong><span>IMapProvider · IPaymentProvider · etc.</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>Infrastructure Adapter</strong><span>Auth · mapping · retries · protocol</span></div><div class="arrow-cell">→</div><div class="flow-card external"><strong>External Provider</strong><span>Provider API / device</span></div></div></div>
+<div class="lane-card"><h3>Inbound callback / webhook</h3><div class="simple-flow dense"><div class="flow-card external"><strong>External Provider</strong><span>Webhook / device message</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>Infrastructure Endpoint</strong><span>Verify · parse · normalize</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>Application Command / Event</strong><span>Provider-neutral input</span></div></div></div>
+<div class="provider-list"><span class="provider-chip">Google Maps / Routing</span><span class="provider-chip">Meta / WhatsApp</span><span class="provider-chip">Payment Gateway</span><span class="provider-chip">School System API</span><span class="provider-chip">Attendance Device</span><span class="provider-chip">Notifications</span></div>
+<figcaption>Provider-specific SDKs and protocols stay outside Domain and Application.</figcaption></figure>
+<table><thead><tr><th>Application abstraction</th><th>Initial / likely adapter</th><th>Architectural responsibility</th></tr></thead><tbody>
+<tr><td>IMapProvider / route-matrix abstraction</td><td>Google Maps provider</td><td>Location capture, routing/travel-time matrix and navigation integration. Provider remains replaceable.</td></tr>
+<tr><td>IWhatsAppProvider</td><td>WhatsApp Business/API adapter</td><td>Automated parent pin intake and configured outbound messaging where access, approval and cost are viable.</td></tr>
+<tr><td>IPaymentProvider</td><td>Provider TBD</td><td>Payment initiation/result/document integration; gateway-specific failure/refund rules remain open.</td></tr>
+<tr><td>IAttendanceDeviceProvider</td><td>Hardware adapter TBD</td><td>Translate device/card/key protocol into normalized boarding/exit attendance events.</td></tr>
+<tr><td>ISchoolSystemProvider</td><td>School-specific anti-corruption adapter</td><td>Map external API schemas into internal contracts and prevent external data models from becoming domain models.</td></tr>
+</tbody></table>
+<div class="callout"><strong>Data-processing boundary.</strong> Maps, WhatsApp, payment, push/notification, school-system and future AI providers may receive personal data. Each adapter must minimize the fields disclosed, authenticate callbacks, apply provider-specific retention/security rules, and participate in the deployment's third-party and cross-border processing assessment.</div></section><section class="major-section"><h1 id="persistence-and-transaction-strategy">14. Persistence and Transaction Strategy</h1>
+<p class="section-intro">One PostgreSQL/PostGIS database is used per school deployment. Module ownership remains logical even when modules share the same physical database. Commands and queries intentionally use different persistence paths.</p>
+<figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 11</b>Command and Query Persistence Paths</div>
+<div class="lane-card"><h3>Command side · state change</h3><div class="simple-flow dense"><div class="flow-card core"><strong>Command Handler</strong><span>Use-case intent</span></div><div class="arrow-cell">→</div><div class="flow-card domain"><strong>Aggregate</strong><span>Rules + domain events</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>Repository</strong><span>Load / track only</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>IUnitOfWork</strong><span>One SaveChanges</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>PostgreSQL</strong><span>Atomic transaction</span></div></div></div>
+<div class="lane-card"><h3>Query side · read projection</h3><div class="simple-flow dense"><div class="flow-card core"><strong>Query Handler</strong><span>Read-only use case</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>Read Service</strong><span>DbContext / purpose-built query</span></div><div class="arrow-cell">→</div><div class="flow-card neutral"><strong>Projection</strong><span>AsNoTracking</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>DTO</strong><span>Return model</span></div></div></div>
+<div class="figure-band"><strong>Persistence rule:</strong> repositories never call SaveChanges; IUnitOfWork owns the command commit. Queries do not need aggregate repositories.</div>
+<figcaption>Commands and queries share the database but use different persistence paths.</figcaption></figure>
+<ul>
+<li>PostGIS is enabled for geospatial data and queries; spatial details remain Infrastructure concerns unless represented by domain value objects.</li>
+<li>Use optimistic concurrency on aggregates where simultaneous administrative edits could cause lost updates.</li>
+<li>Cross-module reads should use explicit contracts/read projections; cross-module writes should use the owning module's Application use case rather than another module's repository/DbSet.</li>
+<li>Durable integration events are persisted as OutboxMessage records in the same transaction as the business mutation that caused them.</li>
+</ul>
+</section><section class="major-section"><h1 id="transactional-outbox">15. Transactional Outbox</h1>
+<p class="section-intro">The outbox closes the consistency gap between a committed business change and a durable cross-module/external reaction. Domain events stay in-process. When a handler needs durable delivery, it translates the domain fact into an Integration Event and stores an OutboxMessage before the command transaction commits.</p>
+<figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 12</b>Transactional Outbox and Durable Event Delivery</div>
+<div class="lane-card"><h3>Phase 1 · same command transaction</h3><div class="simple-flow dense"><div class="flow-card core"><strong>Command Handler</strong><span>Change state</span></div><div class="arrow-cell">→</div><div class="flow-card domain"><strong>Aggregate</strong><span>Raise Domain Event</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>Event Handler</strong><span>Create Integration Event</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>OutboxMessage</strong><span>Serialize durable contract</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>Commit</strong><span>Business data + outbox row</span></div></div></div>
+<div class="lane-card"><h3>Phase 2 · after commit</h3><div class="simple-flow dense"><div class="flow-card external"><strong>Worker</strong><span>Read pending rows</span></div><div class="arrow-cell">→</div><div class="flow-card infra"><strong>Outbox Processor</strong><span>Retry · status</span></div><div class="arrow-cell">→</div><div class="flow-card core"><strong>Consumer</strong><span>Other module / provider reaction</span></div></div></div>
+<div class="figure-band"><strong>Delivery semantics:</strong> atomic persistence + asynchronous at-least-once delivery. Consumers must be idempotent.</div>
+<figcaption>Business changes and Integration Events commit together; delivery happens only after the transaction succeeds.</figcaption></figure>
+<div class="callout"><strong>Reliability rule.</strong> The business mutation and its OutboxMessage commit together. Delivery happens after commit and may be attempted more than once; consumers therefore need an idempotency strategy. No message broker is required initially, and introducing one later does not change Domain aggregates.</div>
+</section><section class="major-section"><h1 id="fuel-cost-and-transportation-cost-management">16. Fuel Cost and Transportation Cost Management</h1>
+<p class="section-intro">The BRD defines a configurable fuel-cost calculator based on an Admin-entered fuel-cost input and applicable trip details. It explicitly describes three calculation approaches. The architecture therefore treats cost calculation as its own business capability rather than hiding it inside Billing / Payments.</p>
+<figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 13</b>Configurable Fuel-Cost Calculation</div>
+<div class="stage-grid">
+<div class="stage-panel"><h3>1 · Inputs</h3><p><strong>Admin:</strong> configured fuel-cost input + selected method.<br/><strong>Planning:</strong> planned trip and required distances.</p></div>
+<div class="stage-panel"><h3>2 · Cost Management</h3><p>Validate inputs, select exactly one calculation strategy, and calculate operational cost.</p></div>
+<div class="stage-panel"><h3>3 · Snapshot</h3><p>Store calculation method, fuel-cost input snapshot, distance snapshot, calculated amount, and plan/trip reference.</p></div>
+</div>
+<div class="option-grid">
+<div class="option-card"><strong>Method A · Planned-trip distance</strong><span>Student-attributable distance through planned stops × configured fuel-cost input.</span></div>
+<div class="option-card"><strong>Method B · Direct distance</strong><span>Direct/isolated home-to-school distance × configured fuel-cost input.</span></div>
+<div class="option-card"><strong>Method C · Shared route allocation</strong><span>Individual segment + allocated share of the common route.</span></div>
+</div>
+<div class="figure-band"><strong>Commercial boundary:</strong> calculated operational fuel/transport cost is not automatically the transportation fee charged to the parent. Billing owns fees, installments, payments, and outstanding balances.</div>
+<figcaption>Cost Management selects one BRD-defined calculation strategy and records a reproducible calculation snapshot.</figcaption></figure>
+<div class="boundary-split"><div class="ownership-card"><h3>Cost Management owns</h3><ul><li>Fuel-cost input/configuration used for calculation</li><li>Calculation method selection</li><li>Trip/student cost calculations and snapshots</li><li>Cost reporting data</li></ul></div><div class="boundary-divider"></div><div class="ownership-card"><h3>Billing / Payments owns</h3><ul><li>Transportation fee charged</li><li>Payment gateway transactions</li><li>Installments and payment documents</li><li>Outstanding balance</li></ul></div></div>
+<div class="callout warning"><strong>Open business detail.</strong> The BRD does not specify the exact fuel-consumption model, unit interpretation/source of the fuel-cost input, or a formula that makes calculated fuel cost equal to the transportation price. Those remain detailed-design decisions. The implementation must preserve this distinction rather than inventing a relationship.</div>
+</section><section class="major-section page-start"><h1 id="testing-strategy">17. Testing Strategy</h1>
+<p class="section-intro">Testing follows the architecture boundaries: domain rules are fastest and most isolated; application tests verify use-case orchestration; integration tests run against real PostgreSQL/PostGIS; API tests verify the full request path; and Architecture.Tests enforce dependency direction while modules remain folder/namespace boundaries.</p>
+<figure class="html-diagram minimal-figure"><div class="figure-label"><b>Figure 14</b>Testing Strategy</div>
+<div class="lane-grid">
+<div class="lane-card"><h3>Confidence stack</h3><div class="test-stack"><div class="flow-card external l1"><strong>Selected E2E</strong><span>Critical business flows only</span></div><div class="flow-card core l2"><strong>API Integration</strong><span>Contracts · auth · validation</span></div><div class="flow-card infra l3"><strong>Infrastructure Integration</strong><span>Real PostgreSQL/PostGIS · outbox</span></div><div class="flow-card domain l4"><strong>Application Unit Tests</strong><span>Handlers · validators · policies</span></div><div class="flow-card domain l5"><strong>Domain Unit Tests</strong><span>Aggregates · value objects · invariants</span></div></div></div>
+<div class="lane-card"><h3>Cross-cutting checks</h3><div class="test-stack"><div class="flow-card policy"><strong>Architecture.Tests</strong><span>Enforce dependency direction</span></div><div class="flow-card core"><strong>Planning datasets</strong><span>Capacity · conflicts · deadlines · quality bounds</span></div><div class="flow-card infra"><strong>Testcontainers</strong><span>Real PostgreSQL/PostGIS for persistence behavior</span></div><div class="flow-card external"><strong>Offline / sync</strong><span>Queue durability · idempotency · version conflicts · stale state</span></div></div></div>
+</div>
+<div class="figure-band"><strong>Optimizer test rule:</strong> assert invariants and acceptable quality bounds rather than one exact route when equivalent solutions are valid.</div>
+<figcaption>Testing depth increases from fast domain rules to selected end-to-end flows, with architecture checks alongside every level.</figcaption></figure>
+<table><thead><tr><th>Level</th><th>Tools</th><th>Focus</th></tr></thead><tbody>
+<tr><td>Domain unit tests</td><td>xUnit</td><td>Aggregates, value objects, state transitions, hard invariants, override rules. Prefer no mocks.</td></tr>
+<tr><td>Application tests</td><td>xUnit + Moq</td><td>Handlers, orchestration, policies, validator behavior, and collaboration with abstractions.</td></tr>
+<tr><td>Infrastructure integration</td><td>xUnit + Testcontainers</td><td>Real PostgreSQL/PostGIS, EF mappings, transactions, outbox, repository/read behavior.</td></tr>
+<tr><td>API integration</td><td>WebApplicationFactory / TestServer</td><td>Authentication/authorization, endpoint contracts, validation and full request path.</td></tr>
+<tr><td>Planning tests</td><td>xUnit + deterministic datasets</td><td>Capacity, resource conflicts, deadlines, hard constraints, unassigned reasons and objective-quality bounds.</td></tr>
+<tr><td>End-to-end</td><td>Selected critical flows</td><td>Registration → PlanningRun → approval → TripExecution → attendance/tracking.</td></tr>
+<tr><td>Architecture tests</td><td>xUnit + NetArchTest</td><td>Clean Architecture dependency direction and forbidden cross-layer references.</td></tr>
+<tr><td>Mobile offline / sync</td><td>React Native integration tests + API integration tests</td><td>Local queue durability, retry after lost response, duplicate operation IDs, partial sync, out-of-order delivery, stale trip versions, reconnect loops, app/device restart, and explicit stale-tracking UI state.</td></tr></tbody></table>
+</section><section class="major-section"><h1 id="mvp-architecture-scope">18. MVP Architecture Scope</h1>
+<table><thead><tr><th>Priority</th><th>Scope</th></tr></thead><tbody>
+<tr><td>Core transportation workflow</td><td>Student/parent profile and precise location; feasibility/seat/shift checks; transportation registration; fleet configuration; Planning Engine; multi-wave scheduling; supervisor review/approval; operational trips; session-specific attendance/status; Driver/Attendant active-trip offline resilience; configurable fuel-cost calculation using the BRD-defined methods; and baseline operational reports required by the BRD.</td></tr>
+<tr><td>Visible / high-impact capabilities</td><td>Fleet-plan visualization on a map, basic live tracking, parent ETA, and WhatsApp location onboarding where technically/commercially viable.</td></tr>
+<tr><td>Can be staged after core proof</td><td>Full payment/refund/failure workflows, advanced report designer/layouts and scheduled analytics, complete chat/announcement experience, validated Bluetooth hardware integration, AI assistant capabilities, complex school-system connectors, and provider-dependent fully offline navigation.</td></tr>
+</tbody></table>
+<div class="callout"><strong>Scope rule.</strong> Architecture readiness is broader than first-release implementation. Baseline Reporting and safe degraded/offline operational behavior are part of the core architecture; advanced report design, fully validated hardware/provider features and complex integrations may be staged by stakeholder-approved delivery scope.</div>
+</section><section class="major-section">
+<h1 id="security-privacy-and-regulatory-baseline">19. Security, Privacy and Regulatory Baseline</h1>
+<p class="section-intro">The system handles student identity, home location, trip association, boarding/exit history, vehicle movement context, parent/contact information and payment-related data. Security and privacy controls are therefore architecture requirements. The items below describe the technical baseline; final legal obligations, lawful bases and contractual roles require qualified legal/compliance confirmation before production.</p>
+<table>
+<thead><tr><th>Area</th><th>Architecture baseline</th></tr></thead>
+<tbody>
+<tr><td>Access and least privilege</td><td>Role- and purpose-based authorization for Super Admin, Admin, Transportation Supervisor, Driver, Attendant and Parent/Student. Drivers/attendants receive only assigned-trip operational data; parents receive only information appropriate to their own child. Do not expose other students' identities, home pins or route details without a defined need.</td></tr>
+<tr><td>Data classification</td><td>Student identity, home location, attendance, trip and movement information are protected personal data and are treated by this architecture as high-risk operational data because they relate to children and physical movement. Do not label all such data as statutory <em>Sensitive Personal Data</em>; that term is reserved for categories defined by applicable law, such as financial, health, biometric and other designated data.</td></tr>
+<tr><td>Auditability</td><td>Audit plan approvals/overrides, manual attendance corrections, cost configuration, payment administration, permission changes, sensitive report exports, consent/compliance records where applicable, and other critical actions.</td></tr>
+<tr><td>Data minimization and retention</td><td>Collect, cache, report and disclose only what is required for the stated purpose. Tracking history, local mobile cache, report exports, provider payloads and backups require explicit retention/expiration rules. Data should not be retained merely because storage is available.</td></tr>
+<tr><td>Mobile/offline storage</td><td>Use encrypted local storage for the minimal active-trip snapshot and pending operations; use platform Keychain/Keystore for secrets. Define logout, expiry, device-loss and wipe behavior. Evaluate MDM controls for school-owned tablets where operationally appropriate.</td></tr>
+<tr><td>Provider / disclosure boundary</td><td>Maps, WhatsApp, payment, push/notification, school-system and future AI providers are explicit data-processing boundaries. Minimize disclosed fields, authenticate webhooks, define processor/security obligations and assess data location/cross-border transfers before enabling a provider.</td></tr>
+<tr><td>Reporting / exports</td><td>Reports use purpose-specific projections, field/role authorization, export auditing, retention controls and masking/redaction where appropriate. A finance report should not receive precise location history simply because it exists in the same database.</td></tr>
+</tbody></table>
+<h2>19.1 Jordan regulatory baseline</h2>
+<div class="callout definition"><strong>Jordan deployment baseline.</strong> Design to support compliance with Jordan Personal Data Protection Law No. 24 of 2023, effective 17 March 2024, together with regulations and instructions issued pursuant to it, including the Security, Technical and Organizational Measures Instructions of 2025. The law's definition of personal data includes information capable of identifying a person directly or indirectly, including data relating to places where the person exists.</div>
+<ul>
+<li><strong>Consent / guardian:</strong> where prior consent is the applicable legal basis, the law requires it to be explicit/authenticated, specific as to duration and purpose, and requested clearly. Article 5 also addresses consent by a parent/legal guardian for a person who lacks legal capacity. The product should be architecture-ready to retain evidence, purpose, policy/version, grant/withdrawal and timing without assuming consent is the only lawful basis for every processing activity.</li>
+<li><strong>DPO:</strong> Article 11 expressly includes processing data of persons who lack legal capacity, processing sensitive personal data, financial information, and transferring databases outside the Kingdom among cases relevant to appointment of a Data Protection Officer. Applicability and the school/vendor responsibilities must be confirmed before production.</li>
+<li><strong>DPIA:</strong> the 2025 security instructions require a Data Protection Impact Assessment in specified cases, including sensitive-personal-data processing or transfer outside Jordan, and when required by the Council. Independently of the legal trigger analysis, this architecture recommends a DPIA before production because the product combines children's home locations, transport schedules, attendance and movement context.</li>
+<li><strong>Transfers / residency:</strong> hosting region and third-party providers are compliance decisions as well as technical/commercial decisions. Cross-border transfer conditions, adequacy/permissions and processor contracts must be assessed before production.</li>
+<li><strong>Data-subject lifecycle:</strong> production design must support applicable access, correction, objection, consent withdrawal, erasure/anonymization, complaint, breach-notification and retention obligations.</li>
+</ul>
+<div class="callout warning"><strong>No compliance claim by architecture alone.</strong> The document states a design baseline and production-readiness obligations. It must not state that a deployment “is compliant” until the actual school, vendor contracts, data flows, hosting region, policies and operational procedures are legally reviewed and implemented.</div>
+<p class="small-note"><strong>Primary regulatory references:</strong> Jordan Ministry of Digital Economy and Entrepreneurship — Personal Data Protection Law No. 24 of 2023; Security, Technical and Organizational Measures Instructions of 2025; Data Disclosure Regulation 2025; and the Ministry's DPIA guidance/forms. Legal/compliance teams should validate the current official Arabic text and any later regulations/instructions before production.</p>
+</section><section class="major-section"><h1 id="open-technical-decisions">20. Open Technical Decisions</h1>
+<table><thead><tr><th>Decision</th><th>Status / next action</th></tr></thead><tbody>
+<tr><td>Hosting provider, region and topology</td><td>Open. Keep Docker/Linux portable; choose after pilot constraints, security/operations model, budget, data residency and cross-border transfer requirements are known.</td></tr>
+<tr><td>Exact Planning Engine strategy</td><td>Open. Prototype OR-Tools and compare decomposed vs more joint assignment/routing/scheduling approaches using representative school datasets.</td></tr>
+<tr><td>Serviceability definition</td><td>Open. Confirm polygon/radius/route/service-zone rules and supervisor review behavior with transportation operations.</td></tr>
+<tr><td>Maximum ride-time policy</td><td>Configurable. Exact default and which limits are human-overridable remain to be confirmed. The solver must not silently waive a configured hard rule.</td></tr>
+<tr><td>Turnaround model</td><td>Open. Must account for real trip end/start location and operational buffer, not merely a guessed fixed number of minutes.</td></tr>
+<tr><td>Map/routing provider and commercial model</td><td>Open. Validate routing/travel-matrix capability, quotas and cost before locking the provider.</td></tr>
+<tr><td>Fuel-cost input / consumption model</td><td>Open. The BRD says the Admin enters fuel cost and identifies three calculation approaches, but the exact unit/source/input method and fuel-consumption model require detailed confirmation.</td></tr>
+<tr><td>Transportation pricing policy</td><td>Open. The BRD requires price presentation before registration but does not define a formula linking that commercial price to fuel-cost calculations. Define the pricing rule explicitly before implementation.</td></tr>
+<tr><td>WhatsApp integration</td><td>Desired. Validate API access, onboarding/approval, supported location-message payloads, template requirements and commercial cost.</td></tr>
+<tr><td>Attendance hardware</td><td>Unvalidated. Keep the normalized attendance-source abstraction and defer vendor/protocol/card-key decision until hardware is selected.</td></tr>
+<tr><td>Payment provider</td><td>Open. Confirm gateway, methods/currency, successful-payment document, installments, failures, refunds and reconciliation behavior.</td></tr>
+<tr><td>GPS retention and privacy</td><td>Open. Define operational need, retention period, parent visibility and access controls before production.</td></tr>
+<tr><td>Mobile offline / synchronization policy</td><td>Baseline direction is store-and-forward for Driver/Attendant operations. Finalize local schema, queue ordering, idempotency keys, server acknowledgements, stale-version conflict rules, cache expiry/wipe, maximum offline duration and operational UX.</td></tr><tr><td>Offline navigation capability</td><td>Open. Confirm whether cached stops/route geometry are sufficient or the selected map provider/device must support fully offline turn-by-turn navigation. Do not promise provider-dependent offline navigation before validation.</td></tr><tr><td>Privacy roles, lawful basis and compliance operating model</td><td>Open. Confirm Controller/Processor responsibilities, lawful basis/consent model, guardian evidence, DPO obligations, data-subject request workflow, breach handling, retention schedule and contractual responsibilities for each deployment.</td></tr><tr><td>Data residency and cross-border processing</td><td>Open. Inventory hosting, backups, maps, WhatsApp, payments, push notifications, observability and future AI providers; identify where personal data is processed/stored and complete the applicable Jordan transfer assessment before production.</td></tr></tbody></table></section><section class="major-section"><h1 id="initial-architecture-decision-records-adr-summary">21. Initial Architecture Decision Records (ADR Summary)</h1>
+<table><thead><tr><th>ADR</th><th>Decision</th><th>Rationale</th></tr></thead><tbody>
+<tr><td>ADR-001</td><td>One school per deployment</td><td>Reduces tenant complexity and strengthens isolation for the initial product.</td></tr>
+<tr><td>ADR-002</td><td>Modular monolith with shared layer projects</td><td>Preserves module-first boundaries without dozens of assemblies or microservice overhead; Architecture.Tests protects dependency direction.</td></tr>
+<tr><td>ADR-003</td><td>Separate Worker host</td><td>Long-running Planning jobs and durable background delivery must not be tied to HTTP request lifetime. The Worker hosts Application use cases rather than bypassing module boundaries.</td></tr>
+<tr><td>ADR-004</td><td>PostgreSQL + PostGIS</td><td>Provides relational consistency plus native spatial capability for location-heavy transportation workflows.</td></tr>
+<tr><td>ADR-005</td><td>React Native mobile</td><td>Meets required mobile roles while reusing TypeScript skills and reducing an additional language/runtime in the initial team.</td></tr>
+<tr><td>ADR-006</td><td>Pragmatic CQRS + mediator</td><td>Commands protect aggregate behavior and commit through Unit of Work; queries use efficient read projections without requiring separate databases.</td></tr>
+<tr><td>ADR-007</td><td>Framework-free domain events + Application handlers</td><td>Domain events remain domain facts; Infrastructure adapts them to mediator notifications without coupling Domain to MediatR.</td></tr>
+<tr><td>ADR-008</td><td>Transactional outbox</td><td>Business changes and durable Integration Events commit atomically; the Worker provides retryable at-least-once delivery.</td></tr>
+<tr><td>ADR-009</td><td>Versioned PlanningRun artifacts</td><td>Preserves optimizer input/output, supervisor revisions, approvals, violations and auditability.</td></tr>
+<tr><td>ADR-010</td><td>Provider abstractions / anti-corruption adapters</td><td>Prevents vendor SDKs and external schemas from becoming Domain/Application dependencies.</td></tr>
+<tr><td>ADR-011</td><td>Separate Cost Management from Billing / Payments</td><td>The BRD defines operational fuel/transportation-cost calculation separately from fee collection/installments. This prevents accidental assumptions that calculated cost equals the parent fee.</td></tr>
+<tr><td>ADR-012</td><td>Driver/Attendant mobile uses store-and-forward synchronization</td><td>Active-trip operation and attendance must survive temporary connectivity loss without moving network concerns into the domain model; local operations are encrypted, idempotent and reconciled explicitly.</td></tr><tr><td>ADR-013</td><td>Privacy/regulatory requirements are architecture inputs</td><td>Children's location/movement data, local device caches, reports and third-party providers require minimization, access, audit, retention and deployment-specific compliance checks. Jordan deployments use PDPL No. 24 of 2023 and applicable regulations/instructions as the regulatory baseline.</td></tr></tbody></table></section><section class="major-section"><h1 id="recommended-next-design-work">22. Recommended Next Design Work</h1>
+<ol>
+<li>Define the Planning Engine mathematically: decision variables, hard/soft/human-overridable constraints, objective function, multi-wave resource calendars and feasibility-validation rules.</li>
+<li>Define aggregate boundaries and module contracts for Student, TransportationRegistration, PlanningRun, TripPlan/TripExecution, Attendance, Cost Management and Billing / Payments.</li>
+<li>Confirm the fuel-cost input/unit/source and exact calculation details for all three BRD-defined methods; separately define the commercial transportation-pricing policy.</li>
+<li>Create domain/state-transition diagrams for registration, planning approval/revision, trip execution, session attendance/status, cost calculation and payment lifecycle.</li>
+<li>Prototype a representative OR-Tools dataset before locking the solver decomposition and performance assumptions.</li>
+<li>Define API/Worker planning-job lifecycle, cancellation, failure/retry behavior and planning-status persistence.</li>
+<li>Validate map/routing provider pricing/limits, WhatsApp feasibility, payment-provider requirements and attendance-device protocol.</li>
+<li>Turn the decisions that stabilize into individual ADR files and maintain C4 Level 1/2 diagrams as the implementation evolves.</li>
+<li>Define the Driver/Attendant offline synchronization contract: local trip snapshot, client outbox schema, idempotency/ordering, acknowledgement states, trip-version conflicts, cache expiration/wipe, reconnect behavior and offline UX.</li><li>Create a privacy/data-flow inventory for student, location, tracking, attendance, reporting, payments and each external provider; confirm Jordan deployment roles/lawful bases, retention, DPO/DPIA obligations, data residency/transfers and data-subject request procedures with legal/compliance stakeholders.</li><li>Define the baseline BRD reporting catalogue separately from advanced report-design features, including purpose-specific fields, authorization, export auditing, retention and masking/redaction rules.</li></ol></section><section class="major-section"><h1 id="brd-v2-traceability-notes">23. BRD v2 Traceability Notes</h1>
+<p>This architecture is derived from the supplied School Transportation Solution BRD Version 2. The following requirements materially shape the design:</p>
+<ul>
+<li>Accurate student location capture and automated WhatsApp pin intake where technically feasible.</li>
+<li>Pre-registration serviceability, seat availability, requested shift/session and applicable price presentation.</li>
+<li>Route planning using configurable time/fuel objectives and constraints such as capacity, location, grade, gender and other Admin-configured criteria.</li>
+<li>Multiple trips per bus per shift with non-overlapping bus/driver/attendant schedules and sufficient turnaround time.</li>
+<li>Supervisor review/modification of generated plans before operational use.</li>
+<li>Driver and Bus Attendant trip access, communication and attendance support.</li>
+<li>Real-time bus tracking, operational communication and parent ETA updates.</li>
+<li>Morning/afternoon session-specific transportation status and attendance/punch records.</li>
+<li>A configurable fuel-cost calculator supporting: planned-trip attributable distance, direct/isolated distance, and shared/common-route allocation; Admin selects the applicable approach.</li>
+<li>Online transportation-fee collection, successful-payment document, installments, payment records and outstanding balance.</li>
+<li>Reports covering feasibility, trip schedules, movement, attendance/status, fuel/transportation costs, payments/installments, and relevant communications.</li>
+</ul>
+<div class="callout warning"><strong>Requirements still requiring detailed confirmation.</strong> Exact route-optimization algorithm, serviceability logic, scheduling/turnaround rules, tracking/GPS architecture, attendance hardware/protocol, notification templates/channels, payment provider/failure/refund model, school-system API mapping, report formats/retention, authentication policy, and the exact fuel-cost input/consumption model remain open. The BRD also does not define a pricing formula that equates fuel cost with the fee charged to parents.</div>
+<div class="callout"><strong>Implementation baseline.</strong> The reusable backend template and this architecture use the same Clean Architecture project topology, module-first folder boundaries, CQRS/Mediator, FluentValidation, rich aggregates, framework-free domain events, Application event handlers, explicit Unit of Work, PostgreSQL/PostGIS, transactional outbox, Worker host, Testcontainers and architecture tests. The next deep-design focus remains the Planning Engine and the newly explicit Cost Management rules.</div>
+<div class="callout definition"><strong>Architecture-derived production-readiness additions.</strong> Offline Driver/Attendant synchronization and the Jordan privacy/regulatory baseline are not explicit functional requirements in the supplied BRD. They are added here because the implementation handles real-world bus connectivity loss and personal data relating to children, home locations, attendance and movement. These additions do not change the BRD business scope; they define how the solution must operate safely and credibly in production.</div></section></main></div></body></html>

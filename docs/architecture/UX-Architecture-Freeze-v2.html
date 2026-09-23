@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>School Transportation SaaS — UX / Architecture Freeze v2</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--text:#171a21;--muted:#667085;--line:#e4e7ec;--accent:#2457e6;--good:#16753b;--warn:#a15c00;--bad:#b42318}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text)}button,input,select{font:inherit}
+.app{display:grid;grid-template-columns:285px 1fr;min-height:100vh}.side{background:#101828;color:#fff;padding:20px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-weight:800;font-size:18px;margin:0 8px}.small{font-size:12px;color:#98a2b3;margin:5px 8px 18px}.group{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#667085;margin:18px 10px 7px}
+.nav button{width:100%;border:0;background:transparent;color:#cbd5e1;padding:9px 11px;border-radius:9px;text-align:left;cursor:pointer;margin:1px 0}.nav button.active,.nav button:hover{background:#1d2939;color:#fff}
+.main{padding:26px;max-width:1500px;width:100%;margin:0 auto}.screen{display:none}.screen.active{display:block}
+.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}h1{margin:0 0 5px;font-size:27px}h2{font-size:20px;margin:0 0 12px}h3{font-size:15px;margin:0 0 7px}p{line-height:1.5}.muted{color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:0 8px 28px rgba(16,24,40,.06)}.grid{display:grid;gap:15px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.metric{font-size:29px;font-weight:800}.label{font-size:13px;color:var(--muted)}.pill{display:inline-flex;padding:6px 9px;border-radius:999px;background:#eef2f6;font-size:12px;font-weight:700}.good{background:#e9f7ee;color:var(--good)}.warn{background:#fff4e5;color:var(--warn)}.bad{background:#feeceb;color:var(--bad)}.info{background:#edf3ff;color:var(--accent)}
+.flow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.flow span{background:#f2f4f7;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:700}.flow b{color:#98a2b3}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;font-weight:650;cursor:pointer}.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.actions{display:flex;gap:8px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted)}
+.callout{border-left:4px solid var(--accent);background:#eef4ff;border-radius:9px;padding:11px 13px}.callout.warn{border-left-color:#f79009;background:#fff7e8}.callout.bad{border-left-color:#f04438;background:#fff0ef}
+.map{height:330px;border:1px solid #d0d5dd;border-radius:12px;background:linear-gradient(25deg,transparent 48%,#d9dee7 49%,#d9dee7 51%,transparent 52%),linear-gradient(155deg,transparent 48%,#d9dee7 49%,#d9dee7 51%,transparent 52%),#eef1f5;display:grid;place-items:center;color:#667085;font-weight:700}
+.code,.arch{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f5f7f9;border:1px solid var(--line);border-radius:9px;padding:10px;white-space:pre-wrap;line-height:1.5;font-size:12px}.arch{background:#0f172a;color:#dbeafe;border:0;padding:15px}
+.issue{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.issue strong{display:block}.form{display:grid;grid-template-columns:190px 1fr;gap:12px;align-items:center;margin:10px 0}.input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#fff}
+.split{display:grid;grid-template-columns:360px 1fr;gap:15px}.steps{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.step{padding:7px 9px;border-radius:8px;background:#eef2f6;font-size:12px;font-weight:700}.on{background:#e9efff;color:var(--accent)}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.side{height:auto;position:relative}.g2,.g3,.g4,.split{grid-template-columns:1fr}.form{grid-template-columns:1fr}}
+</style></head>
+<body><div class="app">
+<aside class="side"><div class="brand">Transportation SaaS</div><div class="small">Private UX + technical architecture freeze v2</div><div class="nav">
+<div class="group">17-step lifecycle</div>
+<button class="active" data-s="backbone">00 · Product backbone</button><button data-s="dashboard">01–02 · Workspace / dashboard</button><button data-s="intake">03 · Registration intake</button><button data-s="location">04 · Parent location</button><button data-s="import">05–06 · Import / data quality</button><button data-s="registration">07–09 · Serviceability / seat / price</button><button data-s="projection">10 · Demand projection</button><button data-s="readiness">11–12 · Readiness / rules</button><button data-s="planning">13 · PlanningRun</button><button data-s="review">14–15 · Supervisor review</button><button data-s="approve">16 · Approve / TripPlans</button><button data-s="operations">17 · Daily TripExecution</button>
+<div class="group">Operational product</div><button data-s="mobile">Driver / Attendant mobile</button><button data-s="tracking">Tracking / attendance / ETA</button><button data-s="cost">Cost vs billing</button><button data-s="reports">Reporting</button>
+<div class="group">Engineering</div><button data-s="architecture">Architecture mapping</button><button data-s="cqrs">CQRS / events</button><button data-s="freeze">Freeze / pushback</button>
+</div></aside>
+<main class="main">
+
+<section id="backbone" class="screen active"><div class="top"><div><h1>Product backbone</h1><div class="muted">The school keeps its admission process. Our product begins when transportation is requested.</div></div><span class="pill good">Architecture-aligned</span></div>
+<div class="card"><h2>One transportation lifecycle</h2><div class="flow"><span>REQUEST</span><b>→</b><span>PIN</span><b>→</b><span>SERVICEABILITY</span><b>→</b><span>SEAT / SHIFT</span><b>→</b><span>PRICE QUOTE</span><b>→</b><span>CONFIRM REGISTRATION</span><b>→</b><span>PLAN</span><b>→</b><span>SUPERVISOR REVIEW</span><b>→</b><span>APPROVE</span><b>→</b><span>TRIP PLANS</span><b>→</b><span>TRIP EXECUTION</span></div></div>
+<div class="grid g3" style="margin-top:15px"><div class="card"><h3>Registration</h3><p class="muted">Precise location, requested shift/session, serviceability, seat availability, waitlist/manual review, price quote snapshot and confirmation.</p></div><div class="card"><h3>Planning</h3><p class="muted">Versioned PlanningRun, constraints, candidate assignment, optimized routes, multi-wave bus/driver/attendant schedules and supervisor revision.</p></div><div class="card"><h3>Operations</h3><p class="muted">Approved TripPlans become date/session TripExecutions with attendance, GPS, ETA, exceptions and offline-capable mobile operation.</p></div></div>
+<div class="callout warn" style="margin-top:15px"><strong>Correction to v1:</strong> serviceability alone is not the registration decision. Our architecture requires explicit seat/shift availability and an applicable price quote before transportation registration is confirmed.</div></section>
+
+<section id="dashboard" class="screen"><div class="top"><div><h1>2026 / 2027 · Semester 1</h1><div class="muted">Registration open</div></div><button class="btn primary">Continue work</button></div>
+<div class="grid g4"><div class="card"><div class="metric">418</div><div class="label">Transportation applications</div></div><div class="card"><div class="metric">379</div><div class="label">Confirmed registrations</div></div><div class="card"><div class="metric">24</div><div class="label">Review / waitlist</div></div><div class="card"><div class="metric">12</div><div class="label">Waiting for pin</div></div></div>
+<div class="grid g2" style="margin-top:15px"><div class="card"><h2>Needs attention</h2><div class="issue"><div><strong>12 parents have not confirmed a location</strong><span class="muted">Resend link / staff follow-up</span></div><button class="btn">Review</button></div><div class="issue"><div><strong>7 registrations require supervisor review</strong><span class="muted">Seat/shift or serviceability ambiguity</span></div><button class="btn">Review</button></div></div><div class="card"><h2>Projected pressure</h2><div class="metric">17–19</div><div class="label">bus-equivalent waves estimated</div><p class="muted">A bus can run multiple waves; physical seat count alone is not planning capacity.</p></div></div></section>
+
+<section id="intake" class="screen"><div class="top"><div><h1>Transportation registration intake</h1><div class="muted">Manual, import, school-system adapter or hosted intake. Admission stays outside our boundary.</div></div><div class="actions"><button class="btn">Import</button><button class="btn primary">+ New application</button></div></div>
+<div class="card"><div class="form"><label>Student</label><input class="input" value="Ahmad Mohammad"></div><div class="form"><label>School reference</label><input class="input" placeholder="Optional / TEMP reference allowed"></div><div class="form"><label>Grade / class</label><input class="input" value="Grade 6"></div><div class="form"><label>Gender</label><select class="input"><option>Male</option><option>Female</option></select></div><div class="form"><label>Parent mobile</label><input class="input" value="0790000000"></div><div class="form"><label>Requested transport</label><select class="input"><option>Morning + Afternoon</option><option>Morning only</option><option>Afternoon only</option></select></div><div class="actions" style="justify-content:flex-end"><button class="btn">Save draft</button><button class="btn primary">Create & request location</button></div></div></section>
+
+<section id="location" class="screen"><div class="top"><div><h1>Parent location confirmation</h1><div class="muted">Mobile-first secure link; WhatsApp/SMS can deliver it, but Student location is stored in our system.</div></div><span class="pill info">Students module owns location</span></div>
+<div class="grid g2"><div class="card"><h2>Ahmad Mohammad</h2><p>Where should the bus pick up Ahmad?</p><div class="map">Interactive map / use current location</div><div class="form"><label>Landmark / notes</label><input class="input" value="Near ABC Pharmacy"></div><label><input type="checkbox" checked> Drop-off is the same location</label><div class="actions" style="justify-content:flex-end;margin-top:15px"><button class="btn primary">Confirm location</button></div></div>
+<div class="card"><h2>Persistence model</h2><div class="code">Student
+  PreciseHomeLocation / PickupLocation (PostGIS)
+  DropoffLocation (when different)
+  LocationSource
+  ConfirmationMethod
+  LocationVersion
+  LandmarkText
+
+TransportationRegistration
+  references Student + current confirmed location
+  stores assessment / seat / quote snapshots</div><div class="callout" style="margin-top:13px">Coordinates are routing truth. Human-readable address and landmark text are supporting context.</div></div></div></section>
+
+<section id="import" class="screen"><div class="top"><div><h1>Import & data quality</h1><div class="muted">Excel/CSV is an adapter and staging workflow, never the system of record.</div></div><button class="btn primary">Upload school's file</button></div>
+<div class="grid g3"><div class="card"><div class="metric">538</div><div class="label">Rows</div></div><div class="card"><div class="metric">501</div><div class="label">Ready</div></div><div class="card"><div class="metric">37</div><div class="label">Human review</div></div></div>
+<div class="card" style="margin-top:15px"><table><tr><th>Source</th><th>Suggested field</th><th>Decision</th></tr><tr><td>Student</td><td>Student name</td><td><span class="pill good">Accepted</span></td></tr><tr><td>Class</td><td>Grade / class</td><td><span class="pill good">Accepted</span></td></tr><tr><td>Mobile No.</td><td>Parent mobile</td><td><span class="pill good">Accepted</span></td></tr><tr><td>Old Bus</td><td>Legacy reference / ignore</td><td><button class="btn">Choose</button></td></tr></table></div><div class="callout warn" style="margin-top:15px"><strong>AI boundary:</strong> AI may suggest mappings/normalization. Deterministic validation and human approval handle ambiguous rows.</div></section>
+
+<section id="registration" class="screen"><div class="top"><div><h1>Pre-registration transportation decision</h1><div class="muted">Serviceability → seat/shift availability → applicable price → confirm, review, waitlist or reject.</div></div><span class="pill info">Registration module</span></div>
+<div class="grid g2"><div class="card"><h2>Ahmad · Morning + Afternoon</h2><div class="map" style="height:245px">Confirmed pin + service area + demand</div><table><tr><td>Serviceability</td><td><span class="pill good">Serviceable</span></td></tr><tr><td>Morning seat/shift</td><td><span class="pill good">Available</span></td></tr><tr><td>Afternoon seat/shift</td><td><span class="pill good">Available</span></td></tr><tr><td>Applicable price quote</td><td><strong>420 JOD snapshot</strong></td></tr></table></div>
+<div class="card"><h2>Decision</h2><div class="flow"><span>Location</span><b>→</b><span>Serviceability</span><b>→</b><span>Seat / shift</span><b>→</b><span>Price</span><b>→</b><span>Confirmation</span></div><p class="muted">The exact serviceability rule and commercial pricing formula are still open business decisions. The UX must expose their results without inventing the formulas.</p><div class="actions"><button class="btn">Manual review</button><button class="btn">Waitlist</button><button class="btn primary">Confirm registration</button></div><div class="callout warn" style="margin-top:13px"><strong>Cost ≠ price.</strong> Registration/Billing price is not automatically calculated operational fuel cost.</div></div></div>
+<div class="card" style="margin-top:15px"><h2>Lifecycle</h2><div class="steps"><span class="step">Application</span><span>→</span><span class="step">Location</span><span>→</span><span class="step">Serviceability</span><span>→</span><span class="step">Seat/shift</span><span>→</span><span class="step">Quote</span><span>→</span><span class="step on">Confirmed</span></div><p class="muted">Alternatives: manual review · waitlist · rejected/unserviceable · cancelled/withdrawn.</p></div></section>
+
+<section id="projection" class="screen"><div class="top"><div><h1>Demand & fleet projection</h1><div class="muted">Registration-period management view; advisory until a PlanningRun validates the full schedule.</div></div><span class="pill warn">Projection</span></div>
+<div class="grid g4"><div class="card"><div class="metric">426</div><div class="label">Confirmed demand</div></div><div class="card"><div class="metric">18</div><div class="label">Active buses</div></div><div class="card"><div class="metric">30</div><div class="label">Available drivers/attendants</div></div><div class="card"><div class="metric">17–19</div><div class="label">Projected bus-equivalent waves</div></div></div>
+<div class="callout warn" style="margin-top:15px">Do not derive feasibility from static total seats alone. Multi-wave capacity depends on travel time, turnaround, arrival deadlines and non-overlapping bus/driver/attendant calendars.</div></section>
+
+<section id="readiness" class="screen"><div class="top"><div><h1>Planning readiness & rules</h1><div class="muted">Only validated registrations and schedulable resources enter the snapshot.</div></div><button class="btn primary">Resolve blockers</button></div>
+<div class="grid g2"><div class="card"><h2>Readiness</h2><div class="issue"><div><strong>Confirmed registrations</strong><span class="muted">512 eligible</span></div><span class="pill good">Pass</span></div><div class="issue"><div><strong>Precise locations</strong><span class="muted">3 invalid/missing</span></div><span class="pill bad">Blocker</span></div><div class="issue"><div><strong>Fleet capabilities / availability</strong></div><span class="pill good">Pass</span></div><div class="issue"><div><strong>Driver / attendant calendars</strong><span class="muted">2 conflicts</span></div><span class="pill bad">Blocker</span></div></div>
+<div class="card"><h2>Business rules</h2><label><input type="checkbox" checked> Never exceed capacity</label><br><br><label><input type="checkbox" checked> Enforce resource overlap restrictions</label><div class="form"><label>Maximum ride time</label><input class="input" value="60 minutes"></div><div class="form"><label>Arrival deadline</label><input class="input" value="07:35"></div><div class="form"><label>Turnaround</label><input class="input" value="Configurable / model pending"></div><div class="form"><label>Objective</label><select class="input"><option>Travel time</option><option>Fuel-related cost</option><option>Weighted objective</option></select></div></div></div></section>
+
+<section id="planning" class="screen"><div class="top"><div><h1>PlanningRun #1842</h1><div class="muted">API creates durable job state; Worker hosts the long-running Planning application use case.</div></div><span class="pill info">Running</span></div>
+<div class="card"><div class="issue"><div><strong>1 · Immutable input snapshot</strong><span class="muted">Students · registrations · fleet · driver/attendant calendars · rules · matrix</span></div><span class="pill good">Done</span></div><div class="issue"><div><strong>2 · Constraint evaluation</strong><span class="muted">Hard · soft · human-overridable</span></div><span class="pill good">Done</span></div><div class="issue"><div><strong>3 · Candidate assignment</strong></div><span class="pill good">Done</span></div><div class="issue"><div><strong>4 · Route optimization</strong><span class="muted">Stop order · time · distance</span></div><span class="pill info">Running</span></div><div class="issue"><div><strong>5 · Multi-wave scheduling</strong><span class="muted">Bus · driver · attendant calendars + turnaround</span></div><span class="pill">Pending</span></div><div class="issue"><div><strong>6 · Final deterministic validation</strong><span class="muted">Violations · metrics · unassigned reasons</span></div><span class="pill">Pending</span></div></div></section>
+
+<section id="review" class="screen"><div class="top"><div><h1>PlanningRun #1842 · Supervisor review</h1><div class="muted">Generated optimizer output is immutable. Supervisor changes create a revision.</div></div><div class="actions"><button class="btn">Compare</button><button class="btn primary">Create revision</button></div></div>
+<div class="split"><div class="card"><h2>Trips / waves</h2><div class="issue"><div><strong>Bus 07 · Wave 1 · 26/27</strong><span class="muted">06:10–06:48</span></div><span class="pill good">Valid</span></div><div class="issue"><div><strong>Bus 07 · Wave 2 · 24/27</strong><span class="muted">06:56–07:31</span></div><span class="pill good">Valid</span></div><div class="issue"><div><strong>Bus 11 · Wave 1 · 27/27</strong><span class="muted">Ride-time warning</span></div><span class="pill warn">Overrideable</span></div></div><div class="card"><div class="map">Multi-wave plan map</div></div></div>
+<div class="card" style="margin-top:15px"><h2>Manual change preview</h2><table><tr><th>Constraint</th><th>Impact</th></tr><tr><td>Capacity</td><td>Valid</td></tr><tr><td>Bus overlap</td><td>Valid</td></tr><tr><td>Driver calendar</td><td>+8 minute overlap — invalid</td></tr><tr><td>Attendant calendar</td><td>Valid</td></tr></table><div class="callout bad" style="margin-top:12px">The system must reject an automatic change that violates a hard resource conflict. A human-overridable rule requires an explicit supervisor reason; a true hard rule is not silently waived.</div></div></section>
+
+<section id="approve" class="screen"><div class="top"><div><h1>Approve plan revision</h1><div class="muted">Approval is audited and turns the reviewed plan into operational TripPlan definitions.</div></div><span class="pill good">Valid</span></div>
+<div class="card"><div class="issue"><div><strong>All hard constraints</strong></div><span class="pill good">Pass</span></div><div class="issue"><div><strong>Human-overridable warnings</strong><span class="muted">1 approved with supervisor reason</span></div><span class="pill warn">Audited</span></div><div class="issue"><div><strong>Resource calendars</strong></div><span class="pill good">Non-overlapping</span></div><div class="actions" style="justify-content:flex-end"><button class="btn">Back</button><button class="btn primary">Approve plan revision v1</button></div></div>
+<div class="callout" style="margin-top:15px"><strong>Boundary:</strong> `PlanningRun / approved revision` is planning history. `TripPlan` is the operational definition. A particular Monday morning creates a `TripExecution`; it does not mutate the PlanningRun.</div></section>
+
+<section id="operations" class="screen"><div class="top"><div><h1>Daily operations · TripExecutions</h1><div class="muted">Date/session-specific execution over approved TripPlans.</div></div><span class="pill info">Monday</span></div>
+<div class="grid g4"><div class="card"><div class="metric">20</div><div class="label">TripExecutions</div></div><div class="card"><div class="metric">18</div><div class="label">Completed</div></div><div class="card"><div class="metric">2</div><div class="label">Active</div></div><div class="card"><div class="metric">3</div><div class="label">Exceptions</div></div></div>
+<div class="card" style="margin-top:15px"><h2>Bus 07 unavailable</h2><p class="muted">The approved TripPlan remains history. Recovery is scoped to affected operational executions/resources.</p><table><tr><th>Candidate resource</th><th>Free capacity</th><th>Schedule impact</th></tr><tr><td>Bus 03</td><td>4</td><td>+7 min</td></tr><tr><td>Bus 09</td><td>7</td><td>+5 min</td></tr><tr><td>Bus 16</td><td>10</td><td>+6 min</td></tr></table><div class="actions" style="margin-top:12px"><button class="btn">Manual recovery</button><button class="btn primary">Generate scoped recovery</button></div></div></section>
+
+<section id="mobile" class="screen"><div class="top"><div><h1>Driver / Attendant mobile</h1><div class="muted">React Native + encrypted active-trip snapshot + durable client outbox/sync.</div></div><span class="pill warn">Offline</span></div>
+<div class="grid g2"><div class="card"><h2>Bus 07 · Morning Wave 1</h2><div class="issue"><div><strong>Connectivity</strong><span class="muted">Last server sync 32 sec ago</span></div><span class="pill warn">Offline</span></div><div class="issue"><div><strong>Queued operations</strong><span class="muted">2 attendance events</span></div><span class="pill info">Stored locally</span></div><div class="issue"><div><strong>Next stop</strong><span class="muted">Sara · 06:58</span></div><button class="btn">Navigate</button></div><div class="actions"><button class="btn">Mark absent</button><button class="btn primary">Boarded</button></div></div>
+<div class="card"><h2>Offline boundary</h2><div class="code">Encrypted local state
+- minimum active TripExecution snapshot
+- stop sequence
+- minimum assigned student data
+- pending operations + idempotency IDs
+- last acknowledged server version
+- cache expiry / wipe metadata
+
+Sync
+- retry after reconnect
+- duplicate safe
+- conflict aware
+- visible stale/sync state</div><div class="callout warn" style="margin-top:12px">Offline operational continuity is frozen. Fully offline turn-by-turn navigation is not promised until the map provider/device is validated.</div></div></div></section>
+
+<section id="tracking" class="screen"><div class="top"><div><h1>Tracking, attendance & ETA</h1><div class="muted">SignalR provides live UX; durable persistence remains authoritative.</div></div><span class="pill good">TripExecution live</span></div>
+<div class="split"><div class="card"><div class="issue"><div><strong>Latest GPS</strong><span class="muted">18 sec old</span></div><span class="pill good">Fresh</span></div><div class="issue"><div><strong>Boarded</strong></div><strong>21 / 26</strong></div><div class="issue"><div><strong>Absent</strong></div><strong>2</strong></div><div class="issue"><div><strong>ETA to school</strong></div><strong>07:39</strong></div></div><div class="card"><div class="map">Live vehicle + route state</div></div></div>
+<div class="card" style="margin-top:15px"><h2>Parent view</h2><div class="flow"><span>Scheduled</span><b>→</b><span>Approaching</span><b>→</b><span>Boarded</span><b>→</b><span>Arrived</span></div><p class="muted">Parents see their own child's status only. Drivers/attendants receive only assigned-trip operational data.</p></div></section>
+
+<section id="cost" class="screen"><div class="top"><div><h1>Cost Management ≠ Billing / Payments</h1><div class="muted">A deliberate domain boundary from the technical architecture.</div></div></div>
+<div class="grid g2"><div class="card"><h2>Operational Cost Management</h2><div class="form"><label>Method</label><select class="input"><option>Planned-trip attributable distance</option><option>Direct / isolated distance</option><option>Shared/common-route allocation</option></select></div><table><tr><td>Plan/trip ref</td><td>TripPlan 07-A</td></tr><tr><td>Distance snapshot</td><td>18.4 km</td></tr><tr><td>Fuel-cost input snapshot</td><td>Configured</td></tr></table><div class="callout warn">Exact fuel-input unit/consumption model is still open. Do not invent it.</div></div>
+<div class="card"><h2>Billing / Payments</h2><table><tr><td>Registration quote snapshot</td><td>420 JOD</td></tr><tr><td>Commercial fee</td><td>420 JOD</td></tr><tr><td>Paid</td><td>210 JOD</td></tr><tr><td>Outstanding</td><td>210 JOD</td></tr></table><div class="callout" style="margin-top:12px">A commercial fee may later use an explicit pricing policy. It is never assumed to equal calculated operational fuel cost.</div></div></div></section>
+
+<section id="reports" class="screen"><div class="top"><div><h1>Baseline operational reporting</h1><div class="muted">Read-oriented cross-module projections; reports never become a second write path.</div></div><button class="btn primary">Export authorized report</button></div>
+<div class="grid g3"><div class="card"><h3>Registration</h3><p class="muted">Feasibility, seat/shift, waitlist/review, confirmed registrations.</p></div><div class="card"><h3>Planning</h3><p class="muted">PlanningRun metrics, violations, multi-wave schedules, revisions.</p></div><div class="card"><h3>Operations</h3><p class="muted">TripExecutions, movement, attendance/status, exceptions.</p></div><div class="card"><h3>Costs</h3><p class="muted">Method/input snapshots and operational cost results.</p></div><div class="card"><h3>Payments</h3><p class="muted">Fees, installments, transactions, outstanding balances.</p></div><div class="card"><h3>Communications</h3><p class="muted">Relevant delivery history subject to purpose/role policy.</p></div></div><div class="callout warn" style="margin-top:15px">Sensitive exports require field/role authorization, auditing, retention and masking/redaction rules.</div></section>
+
+<section id="architecture" class="screen"><div class="top"><div><h1>Architecture mapping</h1><div class="muted">Exact direction from the technical design.</div></div><span class="pill good">Aligned</span></div>
+<div class="arch">Clients
+  Angular 21 Admin / Supervisor
+  React Native Driver / Attendant / Parent
+      └─ encrypted active-trip cache + client outbox
+
+ASP.NET Core API (.NET 10)
+  REST · SignalR · Auth · CQRS/MediatR
+        │
+Application
+  commands / queries · validation behaviors
+  use-case abstractions · event handlers
+        │
+Domain
+  Students · Registration · Fleet · Planning
+  Trips · Attendance · Tracking
+  Cost Management · Billing/Payments
+        │
+Infrastructure
+  EF Core · PostgreSQL/PostGIS
+  transactional outbox · repositories/read models
+  OR-Tools adapter candidate
+  Maps · WhatsApp · Payments · Attendance Device
+  School System anti-corruption adapters
+        │
+.NET Worker
+  long-running Planning application use cases
+  durable outbox/background delivery
+
+Dependency rule:
+Hosts → Infrastructure → Application → Domain
+Provider details never enter Domain/Application.</div></section>
+
+<section id="cqrs" class="screen"><div class="top"><div><h1>CQRS / events mapped to UX</h1><div class="muted">Intent-oriented handlers; exact names stay provisional until aggregate/state diagrams are frozen.</div></div></div>
+<div class="card"><table><tr><th>User intent</th><th>Candidate request</th><th>Owner / reaction</th></tr>
+<tr><td>Confirm student location</td><td><code>ConfirmStudentLocationCommand</code></td><td>Students → may trigger Registration recheck / mark draft Planning inputs stale</td></tr>
+<tr><td>Start transportation application</td><td><code>RegisterTransportationCommand</code></td><td>Registration</td></tr>
+<tr><td>Evaluate pre-registration</td><td><code>EvaluateTransportationRegistrationCommand</code></td><td>Registration orchestrates serviceability + seat/shift + pricing</td></tr>
+<tr><td>Confirm registration</td><td><code>ConfirmTransportationRegistrationCommand</code></td><td>Registration → student becomes eligible for Planning</td></tr>
+<tr><td>Generate plan</td><td><code>GeneratePlanCommand</code></td><td>Planning; durable state + Worker execution</td></tr>
+<tr><td>Supervisor revision</td><td><code>RevisePlanningRunCommand</code></td><td>Planning; immutable original preserved</td></tr>
+<tr><td>Approve plan</td><td><code>ApprovePlanCommand</code></td><td>Planning → creates operational TripPlans</td></tr>
+<tr><td>Start daily trip</td><td><code>StartTripCommand</code></td><td>Trips → TripExecution</td></tr>
+<tr><td>Absent / boarded / exited</td><td><code>MarkStudentAbsentCommand</code> / attendance commands</td><td>Attendance + Trips → ETA/parent status reactions</td></tr>
+<tr><td>Vehicle position</td><td><code>RecordVehiclePositionCommand</code></td><td>Tracking → durable state + realtime projection</td></tr>
+<tr><td>Operational cost</td><td><code>CalculateTransportationCostCommand</code></td><td>Cost Management</td></tr>
+<tr><td>Payment</td><td><code>InitiateTransportationPaymentCommand</code></td><td>Billing/Payments + provider adapter/outbox</td></tr>
+</table></div>
+<div class="callout" style="margin-top:15px"><strong>Transaction rule:</strong> command changes aggregate → aggregate raises framework-free domain event → UoW dispatches Application handlers → tracked changes/outbox records → one SaveChanges transaction. Durable external/cross-module delivery uses separate Integration Events in the transactional outbox.</div></section>
+
+<section id="freeze" class="screen"><div class="top"><div><h1>Freeze & pushback</h1><div class="muted">What I would now freeze and what I refuse to pretend is decided.</div></div></div>
+<div class="card"><table><tr><th>Decision</th><th>Recommendation</th><th>Status</th></tr>
+<tr><td>Deployment / topology</td><td>Single-school isolated DB; module-first Clean Architecture modular monolith + Worker.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Clients / data</td><td>Angular 21 + React Native; PostgreSQL + PostGIS.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Registration</td><td>Serviceability + seat/shift + quote + waitlist/review + confirmation.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Student location</td><td>Students owns precise location; Registration stores decision snapshots.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Multi-wave resources</td><td>Bus, driver and attendant calendars are real Planning constraints.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Planning history</td><td>Immutable generated output; revisions/approval are versioned and audited.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Planning vs operations</td><td>PlanningRun/TripPlan separate from TripExecution/GPS/attendance.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Offline operations</td><td>Driver/Attendant store-and-forward active trip is baseline.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Cost vs billing</td><td>Separate capabilities. No implicit fuel-cost = parent-fee formula.</td><td><span class="pill good">Freeze</span></td></tr>
+<tr><td>Serviceability definition</td><td>Polygon/radius/route/service-zone + supervisor behavior.</td><td><span class="pill warn">Open</span></td></tr>
+<tr><td>Solver strategy</td><td>OR-Tools candidate; prototype representative data before decomposition is frozen.</td><td><span class="pill warn">Open</span></td></tr>
+<tr><td>Turnaround model</td><td>Must include actual end/start location and buffer, not a guessed constant.</td><td><span class="pill warn">Open</span></td></tr>
+<tr><td>Pricing formula</td><td>BRD requires price presentation but formula is not defined.</td><td><span class="pill bad">Do not invent</span></td></tr>
+<tr><td>Maps / WhatsApp / payment / hardware</td><td>Keep adapters; validate capabilities, quotas, protocols and cost.</td><td><span class="pill warn">Open</span></td></tr>
+</table></div>
+<div class="callout bad" style="margin-top:15px"><strong>My current fight:</strong> do not implement the full handler set yet. Freeze aggregate boundaries and state transitions for Student, TransportationRegistration, PlanningRun, TripPlan/TripExecution, Attendance, Cost Management and Billing; then define Planning mathematics/job lifecycle. After that, handlers become much safer to code.</div></section>
+
+</main></div>
+<script>document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(b.dataset.s).classList.add('active');window.scrollTo(0,0)})</script>
+</body></html>
