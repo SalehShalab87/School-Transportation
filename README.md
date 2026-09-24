@@ -1,4 +1,4 @@
-# Backend Template - .NET 10 Clean Architecture (Fixed Architecture Edition)
+# School Transportation - .NET 10 Clean Architecture
 
 A reusable backend foundation aligned with the architecture decisions for the School Transportation Solution. The `Product` module is intentionally only a **sample vertical slice**: use the same structure for `Students`, `Registration`, `Fleet`, `Planning`, `Trips`, `Attendance`, `Tracking`, `Notifications`, `Billing`, and `Reporting`.
 
