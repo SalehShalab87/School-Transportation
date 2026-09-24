@@ -1,6 +1,6 @@
 # School Transportation - .NET 10 Clean Architecture
 
-A reusable backend foundation aligned with the architecture decisions for the School Transportation Solution. The `Product` module is intentionally only a **sample vertical slice**: use the same structure for `Students`, `Registration`, `Fleet`, `Planning`, `Trips`, `Attendance`, `Tracking`, `Notifications`, `Billing`, and `Reporting`.
+A backend foundation aligned with the architecture decisions for the School Transportation Solution. Generic template business entities have been removed so real modules are introduced only from validated transportation requirements.
 
 ## Product documentation
 
@@ -28,14 +28,11 @@ The solution is a **module-first modular monolith inside Clean Architecture laye
 src/
   Domain/
     Common/
-    Products/               # sample module
   Application/
     Common/
-    Products/
   Infrastructure/
     Persistence/
     Messaging/
-    Products/
   Optimization/             # CPU-heavy solver boundary; solver packages stay here
   API/                      # HTTP host
   Worker/                   # background host (outbox + future planning jobs)
@@ -46,9 +43,7 @@ src/
 - `Guid`/PostgreSQL `uuid` IDs instead of GUID strings and Oracle-oriented `IndexId`.
 - PostgreSQL-only persistence; SQL Server, Oracle and EF InMemory production wiring removed.
 - PostGIS-ready Npgsql configuration (`UseNetTopologySuite`).
-- Rich aggregate example with private setters, invariants and explicit behavior.
 - Domain events are framework-free in Domain and adapted to MediatR in Application/Infrastructure.
-- Domain event handlers added.
 - Integration events + transactional outbox added.
 - Repositories no longer call `SaveChangesAsync`.
 - `IUnitOfWork` owns the command transaction boundary.
@@ -109,7 +104,7 @@ Delivery is **at-least-once**. Integration-event handlers must therefore be idem
 HTTP endpoint
    -> MediatR query
    -> query handler
-   -> IProductReadService
+   -> purpose-built read service / projection
    -> EF Core AsNoTracking projection
    -> DTO
 ```
