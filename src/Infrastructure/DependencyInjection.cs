@@ -1,12 +1,9 @@
 using Application.Common.Abstractions;
 using Application.Common.Abstractions.Persistence;
 using Application.Common.Messaging;
-using Application.Products.Abstractions;
-using Domain.Products;
 using Infrastructure.Messaging;
 using Infrastructure.Messaging.Outbox;
 using Infrastructure.Persistence;
-using Infrastructure.Products;
 using Infrastructure.Time;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,10 +33,6 @@ public static class DependencyInjection
         services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
         services.AddScoped<IOutboxWriter, OutboxWriter>();
         services.AddScoped<IOutboxProcessor, OutboxProcessor>();
-
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IProductReadService, ProductReadService>();
-
         services.AddSingleton<IClock, SystemClock>();
 
         return services;
