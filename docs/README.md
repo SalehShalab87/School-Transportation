@@ -1,5 +1,10 @@
 # Product & Architecture Documents
 
+## Start here — living source of truth
+
+**[Pilot Blueprint & Progress Tracker](PILOT-BLUEPRINT-AND-PROGRESS.md)** — one working document for recovered field discoveries, scope, actor journeys, pilot readiness, implementation status, scenario checklist, open decisions and change log. Update it alongside implementation PRs. Its working plans do not override validated evidence or the more specific decisions in `CURRENT-DECISIONS.md`.
+
+
 These documents travel with the codebase and are the design baseline for the School Transportation SaaS.
 
 ## Source documents
